@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中医智能辨证系统 (Pro)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --c-accent: #9F1239;
+            --c-bg: #FAFAF9;
+            --c-text-main: #1C1917;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Serif SC', serif;
+            background-color: var(--c-bg);
+            color: var(--c-text-main);
+            -webkit-font-smoothing: antialiased;
+            
+            /* 页面进场初始状态：完全透明 */
+            opacity: 0;
+            transition: opacity 0.6s ease-out;
+        }
+
+        /* 进场动画类 */
+        body.fade-in {
+            opacity: 1;
+        }
+
+        /* 极简玻璃拟态 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 动画效果 */
+        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(10px); }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* 模拟AI思考光标 */
+        .ai-cursor::after {
+            content: '▋';
+            color: #9F1239;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* 报告样式优化 */
+        .report-header { font-family: 'Noto Serif SC', serif; color: #8B2E33; border-bottom: 2px solid #FEE2E2; padding-bottom: 8px; margin-bottom: 12px; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; }
+        .report-content { font-size: 0.95rem; line-height: 1.7; color: #44403C; text-align: justify; }
+        .highlight-term { color: #881337; font-weight: 600; background: #FFF1F2; padding: 0 4px; border-radius: 2px; }
+        .reason-box { background: #F5F5F4; border-left: 3px solid #D6D3D1; padding: 10px; margin-top: 8px; font-size: 0.9rem; color: #57534E; }
+        
+        /* 录音波纹 */
+        @keyframes ping-slow { 75%, 100% { transform: scale(1.5); opacity: 0; } }
+        .animate-ping-slow { animation: ping-slow 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden bg-[#F5F5F4]">
+
+    <!-- 返回按钮 (修改为 JS 控制以处理环境兼容性) -->
+    <button onclick="goBack()" class="absolute top-4 left-4 z-50 bg-white/80 p-2 rounded-full shadow-md text-stone-500 hover:text-rose-900 transition-colors border border-stone-200" title="返回首页">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+
+    <!-- 左侧：控制台 -->
+    <div class="w-full md:w-[420px] flex flex-col bg-white border-r border-stone-200 z-10 shadow-lg relative">
+        <div class="p-6 md:p-8 flex-1 flex flex-col h-full">
+            
+            <!-- Logo 区块 -->
+            <div class="mb-6 flex items-center justify-between shrink-0 pl-8 md:pl-0"> <!-- pl-8 防止遮挡返回按钮 -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-rose-50 to-white border border-rose-100 rounded-xl flex items-center justify-center shadow-sm text-rose-800">
+                        <!-- 人形图标 -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <!-- 呼吸点 -->
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <h1 class="text-lg font-bold font-serif text-stone-800 tracking-wide leading-tight">智能病案分析</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="flex-1 relative group min-h-[240px]">
+                <textarea id="ai-input" 
+                    class="w-full h-full resize-none bg-stone-50 rounded-2xl p-5 text-stone-700 text-sm leading-relaxed border border-stone-200 focus:border-rose-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-rose-50 transition-all placeholder-stone-400 font-medium"
+                    placeholder="在此输入病案描述...&#10;&#10;【支持指令】&#10;您可以直接输入病案，例如：&#10;“患者男，30岁。发热恶寒，头痛，脉浮紧。”&#10;&#10;也可以指定要求，例如：&#10;“...请写出主诉、八纲结论和辨证分析。”"></textarea>
+                
+                <!-- 语音按钮 -->
+                <button id="voice-btn" onclick="toggleVoiceInput()" class="absolute bottom-4 right-4 w-10 h-10 bg-white border border-stone-200 rounded-full shadow-sm flex items-center justify-center text-stone-400 hover:text-rose-600 hover:border-rose-200 transition-all transform active:scale-95 group/voice z-10" title="点击开始语音输入 (中文)">
+                    <i class="fa-solid fa-microphone text-sm transition-transform group-hover/voice:scale-110"></i>
+                    <span id="voice-wave" class="absolute inset-0 rounded-full border-2 border-rose-500 opacity-0 pointer-events-none"></span>
+                </button>
+            </div>
+
+            <!-- 操作按钮 -->
+            <button onclick="runProAnalysis()" class="mt-6 w-full bg-gradient-to-r from-rose-900 to-rose-800 hover:from-rose-800 hover:to-rose-700 text-white font-medium py-4 rounded-xl shadow-lg shadow-rose-900/10 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shrink-0">
+                <i class="fa-solid fa-wand-magic-sparkles text-sm opacity-80"></i>
+                <span>执行深度辨证推导</span>
+            </button>
+
+            <!-- 底部署名 -->
+            <div class="mt-8 pt-6 border-t border-stone-100 text-center shrink-0">
+                <p class="text-[10px] text-stone-400 font-mono tracking-wider mb-1 opacity-70">POWERED BY</p>
+                <div class="flex items-center justify-center gap-2 text-xs font-bold text-stone-600">
+                    <i class="fa-solid fa-cube text-[10px] text-rose-800"></i>
+                    <span>TCM Intelligent Diagnosis System v3.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：报告展示区 -->
+    <div class="flex-1 overflow-y-auto relative bg-[#F5F5F4]" id="output-area">
+        <!-- 初始状态 -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-stone-300 select-none p-8 text-center">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-stone-100">
+                <i class="fa-solid fa-file-medical text-4xl text-rose-900/10"></i>
+            </div>
+            <h3 class="font-serif text-xl text-stone-500 mb-2 font-bold">等待病案输入</h3>
+            <p class="text-sm text-stone-400 max-w-xs leading-relaxed">
+                系统将模拟专家阅卷思维，自动识别您的指令要求，生成结构化辨证报告。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // === 0. 进场与离场动画逻辑 ===
+        window.onload = function() {
+            // 页面加载完成后，移除透明度，实现淡入效果
+            document.body.classList.add('fade-in');
+            initSpeech(); // 初始化语音
+        };
+
+        function goBack() {
+             // 移除 fade-in 类，触发 CSS opacity: 0 的过渡效果
+             document.body.classList.remove('fade-in');
+             
+             setTimeout(() => {
+                try {
+                    window.location.href = 'index.html';
+                } catch (e) {
+                    console.warn("Preview environment navigation blocked:", e);
+                    alert("提示：页面跳转功能需要在本地下载文件后运行才能生效。\n(Navigation requires running downloaded files locally.)");
+                    // 恢复显示
+                    document.body.classList.add('fade-in');
+                }
+             }, 500); // 配合 CSS transition 0.6s
+        }
+
+        // === 1. 语音识别模块 ===
+        let recognition;
+        let isRecording = false;
+
+        function initSpeech() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'zh-CN';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => { isRecording = true; updateVoiceUI(true); };
+                recognition.onend = () => { isRecording = false; updateVoiceUI(false); };
+                recognition.onresult = (event) => insertText(event.results[0][0].transcript);
+                recognition.onerror = (event) => { 
+                    console.error(event.error); 
+                    isRecording = false; 
+                    updateVoiceUI(false); 
+                    // alert('语音识别中断，请重试'); 
+                };
+            } else {
+                document.getElementById('voice-btn').style.display = 'none';
+            }
+        }
+
+        function toggleVoiceInput() {
+            if (!recognition) initSpeech();
+            if (!recognition) return;
+            isRecording ? recognition.stop() : recognition.start();
+        }
+
+        function updateVoiceUI(recording) {
+            const btn = document.getElementById('voice-btn');
+            const wave = document.getElementById('voice-wave');
+            const icon = btn.querySelector('i');
+            if (recording) {
+                btn.classList.add('text-rose-600', 'border-rose-400');
+                icon.className = 'fa-solid fa-stop animate-pulse';
+                wave.classList.add('animate-ping-slow', 'opacity-100');
+                wave.classList.remove('opacity-0');
+            } else {
+                btn.classList.remove('text-rose-600', 'border-rose-400');
+                icon.className = 'fa-solid fa-microphone';
+                wave.classList.remove('animate-ping-slow', 'opacity-100');
+                wave.classList.add('opacity-0');
+            }
+        }
+
+        function insertText(text) {
+            const textarea = document.getElementById('ai-input');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const val = textarea.value;
+            const prefix = (val.length > 0 && start === val.length && !/[。！？\n]$/.test(val)) ? '，' : '';
+            textarea.value = val.substring(0, start) + prefix + text + val.substring(end);
+            textarea.focus();
+        }
+
+        // === 2. 增强型知识图谱 (Knowledge Graph) ===
+        // 定义脏腑、病机、八纲的逻辑关系
+        const knowledgeBase = {
+            'Heart': {
+                name: '心',
+                patterns: [
+                    { n: '心血虚证', tags: {bl:'里', xs:'虚', hr:'无', yy:'阴'}, s: ['心悸','失眠','多梦','健忘','面色萎黄','眩晕','舌淡','脉细'], mech: '血虚失养，心神不宁' },
+                    { n: '心阴虚证', tags: {bl:'里', xs:'虚', hr:'热', yy:'阴'}, s: ['心悸','心烦','失眠','潮热','盗汗','五心烦热','舌红','少苔','脉细数'], mech: '阴虚火旺，虚热扰神' },
+                    { n: '心火亢盛证', tags: {bl:'里', xs:'实', hr:'热', yy:'阳'}, s: ['心烦','口舌生疮','面赤','口渴','尿黄','舌红','苔黄','脉数'], mech: '火热内扰，上炎口舌' },
+                    { n: '心脉痹阻证', tags: {bl:'里', xs:'实', hr:'无', yy:'阳'}, s: ['心痛','胸闷','痛引肩背','刺痛','舌紫暗'], mech: '瘀血阻滞心脉' }
+                ]
+            },
+            'Liver': {
+                name: '肝',
+                patterns: [
+                    { n: '肝郁气滞证', tags: {bl:'里', xs:'实', hr:'无', yy:'阳'}, s: ['胸胁胀痛','情志抑郁','善太息','乳房胀痛','痛经','脉弦'], mech: '肝失疏泄，气机郁滞' },
+                    { n: '肝火炽盛证', tags: {bl:'里', xs:'实', hr:'热', yy:'阳'}, s: ['头胀痛','面红目赤','口苦','急躁易怒','耳鸣','脉弦数'], mech: '气郁化火，上扰清窍' },
+                    { n: '肝阳上亢证', tags: {bl:'里', xs:'杂', hr:'杂', yy:'阳'}, s: ['眩晕','耳鸣','头重脚轻','腰膝酸软','急躁','面红'], mech: '肝肾阴虚，阳亢于上' }
+                ]
+            },
+            'Spleen': {
+                name: '脾',
+                patterns: [
+                    { n: '脾气虚证', tags: {bl:'里', xs:'虚', hr:'无', yy:'阴'}, s: ['纳呆','食少','腹胀','便溏','神疲','乏力','面色萎黄'], mech: '运化失职，生化无源' },
+                    { n: '脾阳虚证', tags: {bl:'里', xs:'虚', hr:'寒', yy:'阴'}, s: ['腹痛喜温','畏寒肢冷','便溏','水肿','舌淡胖'], mech: '阳虚内寒，温运无力' },
+                    { n: '湿热蕴脾证', tags: {bl:'里', xs:'实', hr:'热', yy:'阳'}, s: ['身目发黄','鲜明','口苦','纳呆','苔黄腻'], mech: '湿热内蕴，熏蒸肝胆' }
+                ]
+            }
+            // 可继续扩展...
+        };
+
+        // 症状属性字典 (用于生成证据链)
+        const symptomMeta = {
+            '面色萎黄': { sign: '血虚/脾虚', type: '虚' }, '舌淡': { sign: '血虚/阳虚', type: '寒/虚' },
+            '脉细': { sign: '血虚/阴虚', type: '虚' }, '潮热': { sign: '阴虚内热', type: '热' },
+            '盗汗': { sign: '阴虚', type: '虚' }, '口舌生疮': { sign: '心火上炎', type: '实热' },
+            '胸胁胀痛': { sign: '肝气郁结', type: '气滞' }, '脉弦': { sign: '肝胆病/痛证', type: '实' },
+            '腰膝酸软': { sign: '肾虚', type: '虚' }, '畏寒肢冷': { sign: '阳虚', type: '寒' }
+        };
+
+        // === 3. 核心算法引擎 (Core Logic) ===
+
+        function runProAnalysis() {
+            const input = document.getElementById('ai-input').value.trim();
+            const output = document.getElementById('output-area');
+
+            if (!input) {
+                alert('请先输入病案信息');
+                return;
+            }
+
+            // 步骤 1: 模拟联网与思考 (UI 动效)
+            simulateAIThinking(output, () => {
+                // 步骤 2: 解析用户意图 (Intent Detection)
+                const intent = parseIntent(input);
+                
+                // 步骤 3: 匹配最佳证型 (Pattern Matching)
+                const analysisResult = matchSyndrome(input);
+
+                if (!analysisResult) {
+                    renderError(output);
+                    return;
+                }
+
+                // 步骤 4: 生成动态报告 (Report Generation)
+                const reportHTML = generateReport(analysisResult, intent, input);
+                output.innerHTML = reportHTML;
+            });
+        }
+
+        // 模拟 AI 思考过程
+        function simulateAIThinking(container, callback) {
+            const steps = [
+                '正在连接中医知识图谱...',
+                '正在检索经典医案库...',
+                '识别关键症候群...',
+                '构建辨证逻辑链...'
+            ];
+            
+            let stepIndex = 0;
+            container.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 border-4 border-rose-100 border-t-rose-600 rounded-full animate-spin mb-6"></div>
+                    <p id="loading-text" class="font-serif text-stone-500 text-lg font-bold animate-pulse">${steps[0]}</p>
+                    <p class="text-xs text-stone-400 mt-2 font-mono">AI LOGIC ENGINE PROCESSING</p>
+                </div>
+            `;
+
+            const interval = setInterval(() => {
+                stepIndex++;
+                if (stepIndex < steps.length) {
+                    document.getElementById('loading-text').innerText = steps[stepIndex];
+                } else {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 600); // 模拟耗时
+        }
+
+        // 意图解析
+        function parseIntent(text) {
+            const intent = {
+                subject: text.includes('主诉'),
+                eight: text.includes('八纲'),
+                diagnosis: true, // 默认总是输出诊断
+                analysis: text.includes('分析') || text.includes('机理'),
+                diff: text.includes('鉴别') || text.includes('排除')
+            };
+            
+            // 如果用户什么都没指定，默认输出全套标准考官模式
+            if (!intent.subject && !intent.eight && !intent.analysis && !intent.diff) {
+                return { subject: true, eight: true, diagnosis: true, analysis: true, diff: true };
+            }
+            return intent;
+        }
+
+        // 证型匹配
+        function matchSyndrome(text) {
+            let bestMatch = null;
+            let maxScore = 0;
+            let matchedSymptoms = [];
+
+            Object.values(knowledgeBase).forEach(organ => {
+                organ.patterns.forEach(pattern => {
+                    let score = 0;
+                    let currentMatches = [];
+                    pattern.s.forEach(symptom => {
+                        if (text.includes(symptom)) {
+                            score += 1;
+                            currentMatches.push(symptom);
+                        }
+                    });
+                    // 证名命中加权
+                    if (text.includes(pattern.n)) score += 5;
+
+                    if (score > maxScore) {
+                        maxScore = score;
+                        bestMatch = { ...pattern, organName: organ.name };
+                        matchedSymptoms = currentMatches;
+                    }
+                });
+            });
+
+            if (maxScore === 0) return null;
+            return { syndrome: bestMatch, keywords: matchedSymptoms };
+        }
+
+        // 生成主诉 (简单抽取算法)
+        function extractSubject(text) {
+            // 尝试提取第一句包含时间的内容
+            const sentences = text.split(/[。！？]/);
+            for (let s of sentences) {
+                if (s.match(/\d+[年月日周天小时]/)) return s.trim();
+            }
+            // 如果没有时间，取第一句症状
+            return sentences[0].replace(/患者.+岁/, '').replace(/,/g, '，').trim() || "未明确提及，建议补充病程时间";
+        }
+
+        // 生成报告 HTML
+        function generateReport(result, intent, originalText) {
+            const { syndrome, keywords } = result;
+            let html = `<div class="p-8 md:p-12 max-w-4xl mx-auto fade-in-up">`;
+
+            // 1. 主诉 (Subject)
+            if (intent.subject) {
+                html += `
+                    <div class="report-section delay-1">
+                        <div class="report-header"><i class="fa-solid fa-pen-to-square mr-2"></i> 主诉</div>
+                        <div class="report-content pl-6">
+                            ${extractSubject(originalText)}。
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 2. 八纲结论 (Eight Principles)
+            if (intent.eight) {
+                const tags = syndrome.tags;
+                let eightText = `本证属于<span class="highlight-term">${tags.bl}</span>证、<span class="highlight-term">${tags.xs}</span>证、`;
+                eightText += tags.hr === '无' ? '寒热不显' : `<span class="highlight-term">${tags.hr}</span>证`;
+                eightText += `，总属<span class="highlight-term">${tags.yy}</span>证。`;
+
+                // 动态理由生成
+                let reason = '';
+                if (tags.bl === '里') reason += '病位在脏腑气血，故属里；';
+                if (tags.xs === '虚') reason += '症状以功能减退为主，脉弱无力，故属虚；';
+                if (tags.xs === '实') reason += '症状表现剧烈，拒按，脉有力，故属实；';
+                if (tags.hr === '热') reason += `见${keywords.filter(k=>k.includes('红')||k.includes('数')||k.includes('热')).join('、')}等热象，故属热；`;
+                
+                html += `
+                    <div class="report-section delay-2">
+                        <div class="report-header"><i class="fa-solid fa-scale-balanced mr-2"></i> 八纲结论</div>
+                        <div class="report-content pl-6">
+                            <p>${eightText}</p>
+                            <div class="reason-box"><strong>推导理由：</strong>${reason || '根据脉证综合判断。'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 3. 证名诊断 (Diagnosis)
+            html += `
+                <div class="report-section delay-3">
+                    <div class="report-header"><i class="fa-solid fa-certificate mr-2"></i> 证名诊断</div>
+                    <div class="report-content pl-6">
+                        <h2 class="text-2xl font-bold text-rose-900 font-serif">${syndrome.n}</h2>
+                        <p class="text-sm text-stone-500 mt-1">病位：${syndrome.organName} &nbsp;|&nbsp; 性质：${syndrome.tags.xs}</p>
+                    </div>
+                </div>
+            `;
+
+            // 4. 辨证分析 (Analysis)
+            if (intent.analysis) {
+                // 动态构建病机句
+                let mechanismText = `患者${syndrome.mech}。`;
+                if (syndrome.organName === '心') mechanismText += '心主神志，神失所养，故见失眠、多梦、健忘；心主血脉，脉道失充，故见心悸、脉细。';
+                else if (syndrome.organName === '脾') mechanismText += '脾主运化，运化失职，清浊不分，故见纳呆、便溏、腹胀。';
+                else if (syndrome.organName === '肝') mechanismText += '肝主疏泄，气机郁滞，经脉不通，故见胁痛、脉弦。';
+                
+                // 串联症状
+                let symptomEvidence = keywords.map(k => {
+                    const meta = symptomMeta[k];
+                    return meta ? `${k}为${meta.sign}之象` : k;
+                }).join('；');
+
+                html += `
+                    <div class="report-section delay-4">
+                        <div class="report-header"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i> 辨证分析</div>
+                        <div class="report-content pl-6">
+                            <p>${mechanismText}</p>
+                            <div class="reason-box mt-2">
+                                <strong>症候证据链：</strong>${symptomEvidence}。
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 5. 鉴别诊断 (Differential) - 自动寻找同脏腑其他证型
+            if (intent.diff) {
+                const siblings = knowledgeBase[Object.keys(knowledgeBase).find(k => knowledgeBase[k].name === syndrome.organName)].patterns.filter(p => p.n !== syndrome.n);
+                
+                if (siblings.length > 0) {
+                    html += `
+                        <div class="report-section delay-4">
+                            <div class="report-header"><i class="fa-solid fa-filter mr-2"></i> 鉴别诊断</div>
+                            <div class="report-content pl-6">
+                    `;
+                    
+                    // 仅列出前2个最相关的进行鉴别
+                    siblings.slice(0, 2).forEach(sib => {
+                        let diffReason = '';
+                        if (syndrome.tags.xs !== sib.tags.xs) diffReason = `该证为${sib.tags.xs}证，而本案表现为${syndrome.tags.xs}证。`;
+                        else if (syndrome.tags.hr !== sib.tags.hr) diffReason = `该证多见${sib.tags.hr}象，本案${syndrome.tags.hr === '无' ? '无明显寒热' : '见'+syndrome.tags.hr+'象'}。`;
+                        else diffReason = `核心病机为${sib.mech}，与本案不符。`;
+
+                        html += `
+                            <div class="mb-3">
+                                <p class="font-bold text-stone-700">与“${sib.n}”鉴别：</p>
+                                <p class="text-sm text-stone-500 ml-4">排除理由：${diffReason}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div></div>`;
+                }
+            }
+
+            html += `
+                <div class="mt-12 pt-6 border-t border-stone-200 text-center">
+                    <p class="text-[10px] text-stone-400 font-mono">Generated by TCM AI Logic Engine</p>
+                </div>
+                </div>
+            `;
+            return html;
+        }
+
+        function renderError(container) {
+            container.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-stone-400">
+                    <i class="fa-regular fa-face-frown-open text-4xl mb-3"></i>
+                    <p class="font-serif">未匹配到典型证型</p>
+                    <p class="text-xs mt-2 text-rose-400">建议输入包含核心症状（如舌象、脉象、寒热特征）的完整描述</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
