@@ -6,576 +6,904 @@
     <title>中医诊断学：全系统复习与实战平台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <style>
-        /* --- 核心样式与美化 --- */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
-
-        :root {
-            --c-primary: #8B2E33; /* 丹砂红 */
-            --c-secondary: #D4B483; /* 纸张黄 */
-            --c-text: #2D3748;    /* 墨色 */
-            --c-bg: #F9F7F2;      /* 米白 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+        
+        :root { 
+            --c-primary: #8B2E33; 
+            --c-secondary: #D4B483; 
+            --c-text: #2D3748; 
+            --c-bg: #F9F7F2; 
         }
 
-        body {
-            font-family: 'Noto Serif SC', 'SimSun', serif;
-            background-color: var(--c-bg);
-            background-image: linear-gradient(#E5E5E5 1px, transparent 1px), linear-gradient(90deg, #E5E5E5 1px, transparent 1px);
-            background-size: 40px 40px;
-            color: var(--c-text);
-            -webkit-tap-highlight-color: transparent;
-            
-            /* 页面过渡基础样式 */
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
+        body { 
+            font-family: 'Noto Serif SC', 'SimSun', serif; 
+            background-color: var(--c-bg); 
+            background-image: linear-gradient(#E5E5E5 1px, transparent 1px), linear-gradient(90deg, #E5E5E5 1px, transparent 1px); 
+            background-size: 40px 40px; 
+            color: var(--c-text); 
+            opacity: 1; 
+            transition: opacity 0.5s ease-in-out; 
         }
 
-        /* 离场动画类 */
-        body.fade-out {
-            opacity: 0;
-        }
+        body.fade-out { opacity: 0; }
 
-        /* 滚动条美化 */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        /* 滚动条美化 - 配合中医配色 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(139, 46, 51, 0.05); }
+        ::-webkit-scrollbar-thumb { background: #D4B483; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8B2E33; }
 
-        /* 卡片特效 */
-        .tcm-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+        /* 卡片样式优化 */
+        .tcm-card { 
+            background: white; 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative; 
+            overflow: hidden; 
         }
         .tcm-card:active { transform: scale(0.98); } 
-        
-        @media (min-width: 768px) {
-            .tcm-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            }
+        @media (min-width: 768px) { 
+            .tcm-card:hover { 
+                transform: translateY(-4px); 
+                box-shadow: 0 12px 20px -8px rgba(139, 46, 51, 0.15); 
+                border-color: #fed7d7;
+            } 
         }
-        
-        .tcm-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--c-primary);
-            opacity: 0;
-            transition: opacity 0.3s;
+        .tcm-card::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 4px; 
+            height: 100%; 
+            background: var(--c-primary); 
+            opacity: 0; 
+            transition: opacity 0.3s; 
         }
         .tcm-card:hover::before { opacity: 1; }
 
-        /* 导航激活态 */
-        .nav-active {
-            color: var(--c-primary);
-            border-bottom: 2px solid var(--c-primary);
-            font-weight: bold;
-            background-color: rgba(139, 46, 51, 0.05);
+        /* 导航状态 */
+        .nav-active { 
+            color: var(--c-primary); 
+            border-bottom: 2px solid var(--c-primary); 
+            font-weight: bold; 
+            background-color: rgba(139, 46, 51, 0.05); 
         }
-        
-        @media (min-width: 768px) {
-            .nav-active { background-color: transparent; }
-        }
-
-        /* 智能按钮动画 */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(139, 46, 51, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(139, 46, 51, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(139, 46, 51, 0); }
-        }
-        .ai-btn-pulse {
-            animation: pulse-ring 2s infinite;
+        @media (min-width: 768px) { 
+            .nav-active { background-color: transparent; } 
         }
 
-        /* 详情模态框动画 */
+        /* 动画定义 */
+        @keyframes pulse-ring { 
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(139, 46, 51, 0.7); } 
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(139, 46, 51, 0); } 
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(139, 46, 51, 0); } 
+        }
+        .ai-btn-pulse { animation: pulse-ring 2s infinite; }
+
         .modal-enter { animation: slideIn 0.3s ease-out forwards; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(20px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        /* 新增：修复原代码缺失的 fade-in 动画 */
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 证型标签颜色 */
-        .tag-xu { background-color: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+        /* 修复 CSS 属性名错误: bg-color -> background-color */
+        .tag-xu { background-color: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; } 
         .tag-shi { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
-        .tag-han { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+        .tag-han { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; } 
         .tag-re { background-color: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+        .tag-wei { background-color: #57534e; color: #f5f5f4; border: 1px solid #292524; }
+        .tag-za { background-color: #F3E8FF; color: #7E22CE; border: 1px solid #D8B4FE; }
     </style>
 </head>
-<body class="pb-24">
-
-    <!-- 顶部导航 -->
-    <header class="bg-white/95 backdrop-blur sticky top-0 z-40 border-b border-stone-200 shadow-sm">
+<body class="pb-24 antialiased selection:bg-rose-100 selection:text-rose-900">
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200 shadow-sm transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-rose-900 rounded-lg flex items-center justify-center text-white text-xl shadow-md">
-                        <i class="fa-solid fa-book-medical"></i>
-                    </div>
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('dashboard')">
+                    <div class="w-10 h-10 bg-rose-900 rounded-lg flex items-center justify-center text-white text-xl shadow-md transform hover:scale-105 transition-transform"><i class="fa-solid fa-book-medical"></i></div>
                     <div>
                         <h1 class="text-base md:text-lg font-bold text-slate-900 tracking-wide">中医诊断复习</h1>
-                        <p class="text-[10px] md:text-xs text-slate-500">新世纪第五版 · 考点库</p>
+                        <p class="text-[10px] md:text-xs text-slate-500 font-medium">新世纪第五版 · 考点库</p>
                     </div>
                 </div>
-
-                <!-- Desktop Nav -->
                 <nav class="hidden md:flex space-x-8">
-                    <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-active px-2 py-4 text-sm transition-colors font-bold">思维导图</button>
+                    <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-active px-2 py-4 text-sm transition-colors font-bold hover:text-rose-700">思维导图</button>
                     <button onclick="switchView('eight')" id="nav-eight" class="text-slate-500 hover:text-rose-900 px-2 py-4 text-sm transition-colors font-medium">八纲辨证</button>
                     <button onclick="switchView('nature')" id="nav-nature" class="text-slate-500 hover:text-rose-900 px-2 py-4 text-sm transition-colors font-medium">病性辨证</button>
                     <button onclick="switchView('location')" id="nav-location" class="text-slate-500 hover:text-rose-900 px-2 py-4 text-sm transition-colors font-medium">脏腑辨证</button>
                 </nav>
-
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 p-2 focus:outline-none active:bg-slate-100 rounded">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 p-2 rounded hover:bg-stone-100 transition"><i class="fa-solid fa-bars text-xl"></i></button>
             </div>
         </div>
-
-        <!-- Mobile Menu (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100 absolute w-full shadow-lg z-50">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100 absolute w-full shadow-xl z-50 animate-fade-in">
             <div class="flex flex-col px-4 py-2 space-y-2">
-                <button onclick="switchView('dashboard')" id="mob-nav-dashboard" class="nav-active text-left px-4 py-3 rounded-lg text-sm font-bold">思维导图</button>
-                <button onclick="switchView('eight')" id="mob-nav-eight" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium">八纲辨证</button>
-                <button onclick="switchView('nature')" id="mob-nav-nature" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium">病性辨证</button>
-                <button onclick="switchView('location')" id="mob-nav-location" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium">脏腑辨证</button>
+                <button onclick="switchView('dashboard')" id="mob-nav-dashboard" class="nav-active text-left px-4 py-3 rounded-lg text-sm font-bold active:bg-rose-50">思维导图</button>
+                <button onclick="switchView('eight')" id="mob-nav-eight" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium active:bg-rose-50">八纲辨证</button>
+                <button onclick="switchView('nature')" id="mob-nav-nature" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium active:bg-rose-50">病性辨证</button>
+                <button onclick="switchView('location')" id="mob-nav-location" class="text-slate-500 text-left px-4 py-3 rounded-lg text-sm font-medium active:bg-rose-50">脏腑辨证</button>
             </div>
         </div>
     </header>
 
-    <!-- 主内容区 -->
-    <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
-
-        <!-- 1. 总览：思维导图 (Dashboard) -->
+    <main class="max-w-7xl mx-auto px-4 py-6 md:py-8 min-h-[calc(100vh-160px)]">
+        <!-- 1. Dashboard -->
         <section id="view-dashboard" class="animate-fade-in">
             <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-rose-900 mb-3">辨证思维流程</h2>
-                    <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto">
-                        摒弃死记硬背，建立“症-机-证”的推导逻辑。
-                    </p>
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-bold text-rose-900 mb-3 tracking-tight">辨证思维流程</h2>
+                    <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto bg-stone-50 py-2 px-4 rounded-full inline-block">摒弃死记硬背，建立“症-机-证”的推导逻辑</p>
                 </div>
-
-                <!-- 流程图设计 (Mobile Stack) -->
                 <div class="flex flex-col md:grid md:grid-cols-5 gap-4 items-center md:items-stretch relative">
-                    <!-- Step 1 -->
-                    <div class="w-full p-6 rounded-lg bg-stone-50 border border-stone-200 flex flex-col items-center text-center hover:border-rose-300 transition active:bg-stone-100">
-                        <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-stone-600 mb-4 text-xl">
-                            <i class="fa-solid fa-eye"></i>
-                        </div>
-                        <h3 class="font-bold text-lg mb-1">1. 收集四诊</h3>
+                    <div class="w-full p-6 rounded-xl bg-gradient-to-br from-stone-50 to-white border border-stone-200 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-default group">
+                        <div class="w-14 h-14 bg-stone-200 group-hover:bg-rose-100 rounded-full flex items-center justify-center text-stone-600 group-hover:text-rose-800 transition-colors mb-4 text-2xl shadow-inner"><i class="fa-solid fa-eye"></i></div>
+                        <h3 class="font-bold text-lg mb-1 text-slate-800">1. 收集四诊</h3>
                         <p class="text-xs text-slate-500">望闻问切</p>
                     </div>
-
-                    <!-- Arrow -->
-                    <div class="flex items-center justify-center text-stone-300 text-2xl py-2 md:py-0">
-                        <i class="fa-solid fa-arrow-down md:hidden"></i>
-                        <i class="fa-solid fa-arrow-right hidden md:block"></i>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="w-full p-6 rounded-lg bg-stone-50 border border-stone-200 flex flex-col items-center text-center hover:border-rose-300 transition active:bg-stone-100">
-                        <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-stone-600 mb-4 text-xl">
-                            <i class="fa-solid fa-balance-scale"></i>
-                        </div>
-                        <h3 class="font-bold text-lg mb-1">2. 八纲定性</h3>
+                    <div class="flex items-center justify-center text-stone-300 text-2xl py-2 md:py-0"><i class="fa-solid fa-arrow-down md:hidden animate-bounce"></i><i class="fa-solid fa-arrow-right hidden md:block animate-pulse"></i></div>
+                    <div class="w-full p-6 rounded-xl bg-gradient-to-br from-stone-50 to-white border border-stone-200 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-default group">
+                        <div class="w-14 h-14 bg-stone-200 group-hover:bg-rose-100 rounded-full flex items-center justify-center text-stone-600 group-hover:text-rose-800 transition-colors mb-4 text-2xl shadow-inner"><i class="fa-solid fa-balance-scale"></i></div>
+                        <h3 class="font-bold text-lg mb-1 text-slate-800">2. 八纲定性</h3>
                         <p class="text-xs text-slate-500">寒热虚实</p>
                     </div>
-
-                    <!-- Arrow -->
-                    <div class="flex items-center justify-center text-stone-300 text-2xl py-2 md:py-0">
-                        <i class="fa-solid fa-arrow-down md:hidden"></i>
-                        <i class="fa-solid fa-arrow-right hidden md:block"></i>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="w-full p-6 rounded-lg bg-stone-50 border border-stone-200 flex flex-col items-center text-center hover:border-rose-300 transition active:bg-stone-100">
-                        <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-stone-600 mb-4 text-xl">
-                            <i class="fa-solid fa-bullseye"></i>
-                        </div>
-                        <h3 class="font-bold text-lg mb-1">3. 脏腑定位</h3>
+                    <div class="flex items-center justify-center text-stone-300 text-2xl py-2 md:py-0"><i class="fa-solid fa-arrow-down md:hidden animate-bounce"></i><i class="fa-solid fa-arrow-right hidden md:block animate-pulse"></i></div>
+                    <div class="w-full p-6 rounded-xl bg-gradient-to-br from-stone-50 to-white border border-stone-200 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-default group">
+                        <div class="w-14 h-14 bg-stone-200 group-hover:bg-rose-100 rounded-full flex items-center justify-center text-stone-600 group-hover:text-rose-800 transition-colors mb-4 text-2xl shadow-inner"><i class="fa-solid fa-bullseye"></i></div>
+                        <h3 class="font-bold text-lg mb-1 text-slate-800">3. 脏腑定位</h3>
                         <p class="text-xs text-slate-500">病位何在</p>
                     </div>
                 </div>
-
-                <div class="mt-8 p-4 md:p-6 bg-rose-50 rounded-lg border border-rose-100">
-                    <h4 class="font-bold text-rose-900 mb-2 text-sm md:text-base"><i class="fa-solid fa-lightbulb mr-2"></i>复习提示</h4>
-                    <p class="text-xs md:text-sm text-rose-800/80 leading-relaxed">
-                        在面对病案时，先定八纲（阴阳/寒热/虚实），再结合脏腑特有症状（如心悸属心，纳呆属脾）进行定位。
-                    </p>
+                <div class="mt-8 p-4 md:p-6 bg-rose-50/50 rounded-xl border border-rose-100 shadow-sm flex items-start gap-4">
+                    <div class="text-rose-900 text-xl mt-1"><i class="fa-solid fa-lightbulb"></i></div>
+                    <div>
+                        <h4 class="font-bold text-rose-900 mb-1 text-sm md:text-base">复习提示</h4>
+                        <p class="text-xs md:text-sm text-rose-800/80 leading-relaxed text-justify">在面对病案时，建议采用<b>“先定性，后定位”</b>的策略。例如，先通过“畏寒肢冷”判断为“阳虚”，再结合“心悸”定位在心，从而推导出“心阳虚证”。</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. 八纲辨证 (Eight Principles) -->
+        <!-- 2. Eight Principles -->
         <section id="view-eight" class="hidden animate-fade-in">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <!-- 左列 -->
                 <div class="space-y-6">
-                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200">
-                        <div class="flex items-center mb-4 border-b pb-2 border-stone-100">
-                            <span class="bg-stone-800 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded mr-3">辨病位</span>
+                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-4 border-b pb-3 border-stone-100">
+                            <span class="bg-rose-900 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded shadow-sm mr-3">辨病位</span>
                             <h3 class="text-lg md:text-xl font-bold text-slate-800">表里辨证</h3>
                         </div>
                         <div class="space-y-3">
-                            <div class="p-3 bg-stone-50 rounded text-sm">
-                                <span class="font-bold text-slate-900">表证：</span>
-                                <span class="text-slate-600">恶寒发热，脉浮。起病急。</span>
+                            <div class="bg-stone-50 rounded-lg p-3 text-sm border-l-4 border-stone-400 hover:bg-stone-100 transition">
+                                <h4 class="font-bold text-slate-800 mb-1">表证 (外感初起)</h4>
+                                <ul class="list-disc list-inside text-slate-600 space-y-1 pl-1">
+                                    <li><strong>核心：</strong>恶寒发热同时并见。</li>
+                                    <li><strong>特点：</strong>起病急，病程短。</li>
+                                    <li><strong>脉舌：</strong>脉浮，苔薄白。</li>
+                                </ul>
                             </div>
-                            <div class="p-3 bg-stone-50 rounded text-sm">
-                                <span class="font-bold text-slate-900">里证：</span>
-                                <span class="text-slate-600">脉沉，苔厚。脏腑功能失调。</span>
+                            <div class="bg-stone-50 rounded-lg p-3 text-sm border-l-4 border-stone-600 hover:bg-stone-100 transition">
+                                <h4 class="font-bold text-slate-800 mb-1">里证 (脏腑病变)</h4>
+                                <ul class="list-disc list-inside text-slate-600 space-y-1 pl-1">
+                                    <li><strong>核心：</strong>但寒不热 / 但热不寒。</li>
+                                    <li><strong>特点：</strong>病情较重，病程较长。</li>
+                                    <li><strong>脉舌：</strong>脉沉，苔厚。</li>
+                                </ul>
+                            </div>
+                            <div class="text-xs text-rose-800 bg-rose-50 p-2.5 rounded border border-rose-100 flex items-center mt-2">
+                                <i class="fa-solid fa-circle-exclamation mr-2"></i><span><strong>半表半里：</strong>寒热往来 (如少阳证)。</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200">
-                        <div class="flex items-center mb-4 border-b pb-2 border-stone-100">
-                            <span class="bg-stone-800 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded mr-3">辨病性</span>
+                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-4 border-b pb-3 border-stone-100">
+                            <span class="bg-rose-900 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded shadow-sm mr-3">辨病性</span>
                             <h3 class="text-lg md:text-xl font-bold text-slate-800">寒热辨证</h3>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="p-3 bg-blue-50 rounded border border-blue-100 text-sm">
-                                <strong class="text-blue-800 block mb-1">寒证</strong>
-                                <ul class="text-slate-600 list-disc list-inside space-y-1">
-                                    <li>畏寒喜暖</li>
-                                    <li>口淡不渴</li>
-                                    <li>舌淡苔白，脉迟</li>
-                                </ul>
-                            </div>
-                            <div class="p-3 bg-orange-50 rounded border border-orange-100 text-sm">
-                                <strong class="text-orange-800 block mb-1">热证</strong>
-                                <ul class="text-slate-600 list-disc list-inside space-y-1">
-                                    <li>恶热喜冷</li>
-                                    <li>口渴喜饮</li>
-                                    <li>舌红苔黄，脉数</li>
-                                </ul>
-                            </div>
+                        <div class="overflow-hidden rounded-lg border border-stone-200">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-stone-100 text-slate-800 font-bold">
+                                    <tr>
+                                        <th class="p-2 w-1/4 pl-4">鉴别</th>
+                                        <th class="p-2 w-1/3 text-blue-800"><i class="fa-regular fa-snowflake mr-1"></i>寒证</th>
+                                        <th class="p-2 w-1/3 text-red-800"><i class="fa-solid fa-fire mr-1"></i>热证</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-100 text-slate-600">
+                                    <tr class="hover:bg-stone-50"><td class="p-2 pl-4 font-bold bg-stone-50/50">寒热</td><td class="p-2">恶寒喜暖</td><td class="p-2">恶热喜冷</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2 pl-4 font-bold bg-stone-50/50">口渴</td><td class="p-2">口淡不渴</td><td class="p-2">渴喜冷饮</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2 pl-4 font-bold bg-stone-50/50">面色</td><td class="p-2">白 / 青</td><td class="p-2">红 / 赤</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2 pl-4 font-bold bg-stone-50/50">四肢</td><td class="p-2">肢冷蜷卧</td><td class="p-2">手足灼热</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2 pl-4 font-bold bg-stone-50/50">二便</td><td class="p-2">尿清长/便溏</td><td class="p-2">尿短赤/便结</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- 右列 -->
                 <div class="space-y-6">
-                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200">
-                        <div class="flex items-center mb-4 border-b pb-2 border-stone-100">
-                            <span class="bg-stone-800 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded mr-3">辨邪正</span>
+                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-4 border-b pb-3 border-stone-100">
+                            <span class="bg-rose-900 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded shadow-sm mr-3">辨邪正</span>
                             <h3 class="text-lg md:text-xl font-bold text-slate-800">虚实辨证</h3>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left text-slate-600 min-w-[300px]">
-                                <thead class="bg-stone-100 text-slate-800 font-bold">
-                                    <tr>
-                                        <th class="p-2 whitespace-nowrap">鉴别点</th>
-                                        <th class="p-2 whitespace-nowrap">虚证</th>
-                                        <th class="p-2 whitespace-nowrap">实证</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-stone-100">
-                                    <tr><td class="p-2 font-bold">病程</td><td class="p-2">久病体弱</td><td class="p-2">新病体壮</td></tr>
-                                    <tr><td class="p-2 font-bold">按诊</td><td class="p-2">隐痛喜按</td><td class="p-2">剧痛拒按</td></tr>
-                                    <tr><td class="p-2 font-bold">脉象</td><td class="p-2">无力</td><td class="p-2">有力</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                             <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 hover:bg-white transition hover:shadow-sm">
+                                 <div class="text-center font-bold text-slate-800 mb-2 border-b border-stone-200 pb-2">虚证 <span class="text-xs font-normal text-slate-500 block">(正气不足)</span></div>
+                                 <ul class="text-xs md:text-sm text-slate-600 space-y-2">
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">病程</span> <span class="font-bold bg-stone-200 px-1 rounded">久病</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">精神</span> <span class="font-bold">萎靡</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">按诊</span> <span class="font-bold text-green-700 bg-green-50 px-1 rounded">喜按</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">脉象</span> <span class="font-bold">无力</span></li>
+                                 </ul>
+                             </div>
+                             <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 hover:bg-white transition hover:shadow-sm">
+                                 <div class="text-center font-bold text-slate-800 mb-2 border-b border-stone-200 pb-2">实证 <span class="text-xs font-normal text-slate-500 block">(邪气亢盛)</span></div>
+                                 <ul class="text-xs md:text-sm text-slate-600 space-y-2">
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">病程</span> <span class="font-bold bg-stone-200 px-1 rounded">新病</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">精神</span> <span class="font-bold">亢奋</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">按诊</span> <span class="font-bold text-rose-700 bg-rose-50 px-1 rounded">拒按</span></li>
+                                     <li class="flex justify-between items-center"><span class="text-slate-400">脉象</span> <span class="font-bold">有力</span></li>
+                                 </ul>
+                             </div>
+                        </div>
+                        <p class="text-xs text-slate-400 text-center mt-3 font-medium bg-stone-50 py-1 rounded">口诀：虚则补之，实则泻之。</p>
+                    </div>
+
+                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-stone-200 ring-1 ring-rose-100 hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-4 border-b pb-3 border-stone-100">
+                            <span class="bg-rose-900 text-white px-2 py-1 text-[10px] md:text-xs font-bold rounded shadow-sm mr-3">辨总纲</span>
+                            <h3 class="text-lg md:text-xl font-bold text-slate-800">阴阳辨证</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-rose-900 mb-3 flex items-center"><i class="fa-solid fa-yin-yang mr-2"></i>阴阳虚损 (慢性)</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 hover:border-blue-200 transition">
+                                        <strong class="text-blue-800 text-sm block mb-1">阳虚证</strong>
+                                        <p class="text-xs text-slate-600 leading-tight">= <span class="font-bold">气虚</span> + <span class="font-bold">寒象</span><br><span class="text-blue-500 mt-2 block font-medium">畏寒肢冷，面白。</span></p>
+                                    </div>
+                                    <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 hover:border-orange-200 transition">
+                                        <strong class="text-orange-800 text-sm block mb-1">阴虚证</strong>
+                                        <p class="text-xs text-slate-600 leading-tight">= <span class="font-bold">血/津亏</span> + <span class="font-bold">热象</span><br><span class="text-orange-500 mt-2 block font-medium">潮热盗汗，烦热。</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-dashed border-stone-200 pt-3">
+                                <h4 class="text-sm font-bold text-slate-700 mb-2">阴阳亡失 (危重急症)</h4>
+                                <ul class="space-y-2 text-xs md:text-sm">
+                                    <li class="flex items-start bg-stone-50 p-2 rounded"><span class="bg-stone-800 text-white px-1.5 py-0.5 rounded text-xs mr-2 shrink-0">亡阳</span><span class="text-slate-600">冷汗淋漓（如水），四肢厥冷，脉微。</span></li>
+                                    <li class="flex items-start bg-stone-50 p-2 rounded"><span class="bg-stone-200 text-slate-800 px-1.5 py-0.5 rounded text-xs mr-2 shrink-0">亡阴</span><span class="text-slate-600">汗热味咸（如油），手足温，脉躁疾。</span></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. 病性辨证 (Nature) -->
+        <!-- 3. Nature (JS Driven) -->
         <section id="view-nature" class="hidden animate-fade-in">
             <div class="flex flex-col lg:flex-row gap-6 h-full">
-                <!-- 侧边菜单 -->
-                <div class="w-full lg:w-1/5 flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 shrink-0 whitespace-nowrap lg:whitespace-normal">
-                    <button onclick="showNatureSub('liuyin')" id="btn-liuyin" class="nature-btn active flex-shrink-0 text-left px-4 py-2 md:py-3 rounded-lg bg-white border border-rose-200 text-rose-900 font-bold shadow-sm text-sm">六淫辨证</button>
-                    <button onclick="showNatureSub('yinyang')" id="btn-yinyang" class="nature-btn flex-shrink-0 text-left px-4 py-2 md:py-3 rounded-lg bg-white border border-transparent text-slate-600 text-sm">阴阳虚损</button>
-                    <button onclick="showNatureSub('qixue')" id="btn-qixue" class="nature-btn flex-shrink-0 text-left px-4 py-2 md:py-3 rounded-lg bg-white border border-transparent text-slate-600 text-sm">气血辨证</button>
-                    <button onclick="showNatureSub('jinye')" id="btn-jinye" class="nature-btn flex-shrink-0 text-left px-4 py-2 md:py-3 rounded-lg bg-white border border-transparent text-slate-600 text-sm">津液辨证</button>
+                <!-- 侧边导航 -->
+                <div class="w-full lg:w-1/5 flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 shrink-0 whitespace-nowrap lg:whitespace-normal no-scrollbar">
+                    <button onclick="showNatureSub('liuyin')" id="btn-liuyin" class="nature-btn active flex-shrink-0 text-left px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 font-bold shadow-sm text-sm transition-all hover:bg-rose-100">六淫辨证</button>
+                    <button onclick="showNatureSub('yinyang')" id="btn-yinyang" class="nature-btn flex-shrink-0 text-left px-4 py-3 rounded-xl bg-white border border-transparent text-slate-600 text-sm transition-all hover:bg-stone-50 hover:text-slate-900">阴阳虚损</button>
+                    <button onclick="showNatureSub('qixue')" id="btn-qixue" class="nature-btn flex-shrink-0 text-left px-4 py-3 rounded-xl bg-white border border-transparent text-slate-600 text-sm transition-all hover:bg-stone-50 hover:text-slate-900">气血辨证</button>
+                    <button onclick="showNatureSub('jinye')" id="btn-jinye" class="nature-btn flex-shrink-0 text-left px-4 py-3 rounded-xl bg-white border border-transparent text-slate-600 text-sm transition-all hover:bg-stone-50 hover:text-slate-900">津液辨证</button>
                 </div>
-
-                <!-- 内容展示区 -->
-                <div class="w-full lg:w-4/5 bg-white rounded-xl shadow-sm border border-stone-200 p-4 md:p-6 min-h-[400px]">
-                    <!-- 1. 六淫 -->
+                <!-- 内容区域 -->
+                <div class="w-full lg:w-4/5 bg-white rounded-xl shadow-sm border border-stone-200 p-5 md:p-8 min-h-[500px]">
                     <div id="nature-liuyin" class="nature-content block">
-                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 border-b pb-2">六淫辨证</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-emerald-700 block mb-1">风淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">游走不定，恶风汗出，脉浮缓。</p>
-                            </div>
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-blue-700 block mb-1">寒淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">冷痛剧烈，得温减，恶寒无汗。</p>
-                            </div>
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-amber-600 block mb-1">暑淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">夏月发病，耗气伤津，高热口渴。</p>
-                            </div>
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-stone-600 block mb-1">湿淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">重浊粘滞，头重如裹，苔腻。</p>
-                            </div>
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-yellow-700 block mb-1">燥淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">干燥伤津，干咳少痰，口鼻干。</p>
-                            </div>
-                            <div class="p-3 border rounded bg-stone-50 active:bg-white transition">
-                                <strong class="text-red-700 block mb-1">火淫证</strong>
-                                <p class="text-xs md:text-sm text-slate-600">热极生火，面赤出血，狂躁。</p>
-                            </div>
-                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-6 border-b pb-3 flex items-center"><i class="fa-solid fa-cloud-bolt text-rose-900 mr-3"></i>六淫辨证</h3>
+                        <div id="grid-liuyin" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"></div>
                     </div>
-                    
                     <div id="nature-yinyang" class="nature-content hidden">
-                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 border-b pb-2">阴阳虚损辨证</h3>
-                        <div class="space-y-4">
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <h4 class="font-bold text-blue-900 text-sm md:text-base">阳虚证 (虚寒)</h4>
-                                <p class="text-xs md:text-sm text-slate-700 mt-1">畏寒肢冷，神疲乏力，口淡不渴，舌淡胖苔白。</p>
-                            </div>
-                            <div class="bg-orange-50 p-4 rounded-lg">
-                                <h4 class="font-bold text-orange-900 text-sm md:text-base">阴虚证 (虚热)</h4>
-                                <p class="text-xs md:text-sm text-slate-700 mt-1">形体消瘦，潮热盗汗，五心烦热，舌红少苔。</p>
-                            </div>
-                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-6 border-b pb-3 flex items-center"><i class="fa-solid fa-yin-yang text-rose-900 mr-3"></i>阴阳辨证</h3>
+                        <div id="content-yinyang"></div>
                     </div>
-                    
                     <div id="nature-qixue" class="nature-content hidden">
-                         <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 border-b pb-2">气血辨证</h3>
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div class="bg-indigo-50 p-3 rounded">
-                                <strong class="block text-indigo-900 mb-2">气病</strong>
-                                <p class="text-xs md:text-sm text-slate-700">气虚（乏力）、气陷（下坠）、气滞（胀痛）、气逆（咳喘/呕吐）。</p>
-                             </div>
-                             <div class="bg-rose-50 p-3 rounded">
-                                <strong class="block text-rose-900 mb-2">血病</strong>
-                                <p class="text-xs md:text-sm text-slate-700">血虚（面黄头晕）、血瘀（刺痛拒按）、血热（出血）、血寒（冷痛）。</p>
-                             </div>
-                         </div>
+                        <div id="content-qixue" class="space-y-8"></div>
                     </div>
-
                     <div id="nature-jinye" class="nature-content hidden">
-                         <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 border-b pb-2">津液辨证</h3>
-                         <ul class="space-y-3 text-sm text-slate-700">
-                             <li class="p-2 border-l-4 border-stone-400 pl-3"><strong>津液亏虚：</strong>口燥咽干，尿少便干，舌红少津。</li>
-                             <li class="p-2 border-l-4 border-stone-400 pl-3"><strong>痰证：</strong>咳痰，胸闷，苔腻脉滑。</li>
-                             <li class="p-2 border-l-4 border-stone-400 pl-3"><strong>饮证：</strong>水停局部（胸胁/胃肠）。</li>
-                             <li class="p-2 border-l-4 border-stone-400 pl-3"><strong>水停证：</strong>水肿（阳水/阴水）。</li>
-                         </ul>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 mb-6 border-b pb-3 flex items-center"><i class="fa-solid fa-glass-water text-rose-900 mr-3"></i>津液辨证</h3>
+                        <div id="content-jinye" class="space-y-6"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. 脏腑辨证 (Location - ZangFu) -->
+        <!-- 4. Location -->
         <section id="view-location" class="hidden animate-fade-in">
-            <!-- 脏腑选择器 -->
-            <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-4 mb-6">
-                <button id="btn-organ-Heart" onclick="renderZangFu('Heart')" class="organ-btn active ring-2 ring-offset-2 ring-rose-500 bg-rose-100 text-rose-900 p-2 md:p-4 rounded-xl flex flex-col items-center hover:bg-rose-200 transition shadow-sm">
-                    <span class="text-xl md:text-2xl mb-1"><i class="fa-solid fa-heart-pulse"></i></span>
+            <!-- 脏腑选择器 (调整网格以容纳6个按钮) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-8">
+                <button id="btn-organ-Heart" onclick="renderZangFu('Heart')" class="organ-btn active ring-2 ring-offset-2 ring-rose-500 bg-rose-100 text-rose-900 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-rose-200 transition shadow-sm transform hover:-translate-y-1">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-heart-pulse"></i></span>
                     <span class="font-bold text-xs md:text-sm">心小肠 (11)</span>
                 </button>
-                <button id="btn-organ-Lung" onclick="renderZangFu('Lung')" class="organ-btn bg-white text-stone-600 p-2 md:p-4 rounded-xl flex flex-col items-center hover:bg-stone-100 transition shadow-sm">
-                    <span class="text-xl md:text-2xl mb-1"><i class="fa-solid fa-lungs"></i></span>
+                <button id="btn-organ-Lung" onclick="renderZangFu('Lung')" class="organ-btn bg-white text-stone-600 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-stone-100 transition shadow-sm transform hover:-translate-y-1 border border-stone-100">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-lungs"></i></span>
                     <span class="font-bold text-xs md:text-sm">肺大肠 (15)</span>
                 </button>
-                <button id="btn-organ-Spleen" onclick="renderZangFu('Spleen')" class="organ-btn bg-white text-amber-700 p-2 md:p-4 rounded-xl flex flex-col items-center hover:bg-amber-50 transition shadow-sm">
-                    <span class="text-xl md:text-2xl mb-1"><i class="fa-solid fa-seedling"></i></span>
+                <button id="btn-organ-Spleen" onclick="renderZangFu('Spleen')" class="organ-btn bg-white text-amber-700 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-amber-50 transition shadow-sm transform hover:-translate-y-1 border border-amber-50">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-seedling"></i></span>
                     <span class="font-bold text-xs md:text-sm">脾胃 (12)</span>
                 </button>
-                <button id="btn-organ-Liver" onclick="renderZangFu('Liver')" class="organ-btn bg-white text-emerald-700 p-2 md:p-4 rounded-xl flex flex-col items-center hover:bg-emerald-50 transition shadow-sm">
-                    <span class="text-xl md:text-2xl mb-1"><i class="fa-solid fa-tree"></i></span>
+                <button id="btn-organ-Liver" onclick="renderZangFu('Liver')" class="organ-btn bg-white text-emerald-700 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-emerald-50 transition shadow-sm transform hover:-translate-y-1 border border-emerald-50">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-tree"></i></span>
                     <span class="font-bold text-xs md:text-sm">肝胆 (8)</span>
                 </button>
-                <button id="btn-organ-Kidney" onclick="renderZangFu('Kidney')" class="organ-btn bg-white text-blue-800 p-2 md:p-4 rounded-xl flex flex-col items-center hover:bg-blue-50 transition shadow-sm">
-                    <span class="text-xl md:text-2xl mb-1"><i class="fa-solid fa-water"></i></span>
+                <button id="btn-organ-Kidney" onclick="renderZangFu('Kidney')" class="organ-btn bg-white text-blue-800 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-blue-50 transition shadow-sm transform hover:-translate-y-1 border border-blue-50">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-water"></i></span>
                     <span class="font-bold text-xs md:text-sm">肾膀胱 (7)</span>
                 </button>
+                <!-- 新增：脏腑兼证按钮 -->
+                <button id="btn-organ-Combined" onclick="renderZangFu('Combined')" class="organ-btn bg-white text-purple-800 p-3 md:p-4 rounded-xl flex flex-col items-center hover:bg-purple-50 transition shadow-sm transform hover:-translate-y-1 border border-purple-50">
+                    <span class="text-xl md:text-3xl mb-2"><i class="fa-solid fa-link"></i></span>
+                    <span class="font-bold text-xs md:text-sm">兼证 (13)</span>
+                </button>
             </div>
-
-            <!-- 证型网格 -->
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-4 md:p-6">
-                <div class="flex justify-between items-center mb-4 md:mb-6 border-b pb-2 md:pb-4">
-                    <h3 class="text-lg md:text-2xl font-bold text-slate-800" id="organ-title">心与小肠病辨证</h3>
-                    <div class="text-[10px] md:text-xs text-slate-500">点击卡片查看详细解析</div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-5 md:p-8 min-h-[400px]">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h3 class="text-xl md:text-3xl font-bold text-slate-800 tracking-tight" id="organ-title">心与小肠病辨证</h3>
+                    <div class="text-[10px] md:text-xs text-slate-500 bg-stone-100 px-3 py-1 rounded-full"><i class="fa-solid fa-hand-pointer mr-1"></i>点击卡片查看详细解析</div>
                 </div>
-                <div id="zangfu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                    <!-- JS动态生成 -->
-                </div>
+                <div id="zangfu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
             </div>
         </section>
-
     </main>
 
-    <!-- 详情模态框 -->
-    <div id="detail-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative animate-fade-in-up flex flex-col">
-            <div class="sticky top-0 bg-rose-900 text-white p-4 flex justify-between items-center z-10 shrink-0">
-                <h3 id="modal-title" class="text-lg md:text-xl font-bold">证型名称</h3>
-                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full transition"><i class="fa-solid fa-times text-lg"></i></button>
+    <!-- Modal: 点击遮罩层可关闭 (增加 onclick) -->
+    <div id="detail-modal" onclick="closeModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+        <!-- 模态框本体: 阻止冒泡防止点内容关闭 -->
+        <div onclick="event.stopPropagation()" class="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative modal-enter flex flex-col">
+            <div class="sticky top-0 bg-rose-900 text-white p-4 md:p-5 flex justify-between items-center z-10 shrink-0 shadow-md">
+                <h3 id="modal-title" class="text-lg md:text-xl font-bold tracking-wide">证型名称</h3>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full transition duration-200" title="关闭"><i class="fa-solid fa-times text-lg"></i></button>
             </div>
-            <div class="p-5 md:p-6 space-y-4 overflow-y-auto">
+            <div class="p-6 md:p-8 space-y-6 overflow-y-auto">
                 <div>
-                    <strong class="text-xs md:text-sm text-slate-500 uppercase">主要症状</strong>
-                    <p id="modal-symptoms" class="text-slate-800 font-medium mt-1 leading-relaxed text-base md:text-lg"></p>
+                    <strong class="text-xs md:text-sm text-slate-500 uppercase tracking-wider block mb-2 border-l-2 border-slate-300 pl-2">主要症状</strong>
+                    <p id="modal-symptoms" class="text-slate-800 font-medium leading-relaxed text-base md:text-lg pl-2"></p>
                 </div>
-                <div class="bg-stone-50 p-4 rounded-lg border border-stone-100">
-                    <strong class="text-xs md:text-sm text-slate-500 uppercase">证候分析 (机理)</strong>
-                    <p id="modal-analysis" class="text-slate-600 mt-2 text-sm leading-relaxed text-justify"></p>
+                
+                <div class="bg-rose-50 p-5 rounded-xl border border-rose-200 relative overflow-hidden shadow-inner">
+                    <div class="absolute right-0 top-0 text-rose-200 opacity-20 text-6xl p-2 transform -rotate-12"><i class="fa-solid fa-highlighter"></i></div>
+                    <strong class="text-sm text-rose-900 uppercase tracking-wider block mb-2 flex items-center"><i class="fa-solid fa-star text-rose-600 mr-2"></i>辨证要点</strong>
+                    <p id="modal-keypoints" class="text-rose-900 font-bold text-base md:text-lg leading-relaxed"></p>
                 </div>
-                <div class="flex gap-2" id="modal-tags">
-                    <!-- Tags injected here -->
+
+                <div class="bg-stone-50 p-5 rounded-xl border border-stone-200">
+                    <strong class="text-xs md:text-sm text-slate-500 uppercase tracking-wider block mb-2 border-l-2 border-stone-400 pl-2">证候分析 (机理)</strong>
+                    <p id="modal-analysis" class="text-slate-600 text-sm md:text-base leading-relaxed text-justify pl-2"></p>
                 </div>
+
+                <div class="flex gap-2 pt-4 border-t border-stone-100" id="modal-tags"></div>
             </div>
         </div>
     </div>
 
-    <!-- 智能分析跳转浮窗 -->
+    <!-- Floating Action Button -->
     <div class="fixed bottom-6 right-6 z-50">
-        <!-- 修改了 onclick 事件，指向跳转函数 -->
-        <button onclick="navigateToAnalysis()" class="ai-btn-pulse bg-rose-900 hover:bg-rose-800 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-xl flex items-center justify-center transition group active:scale-90" title="进入智能病案分析">
-            <!-- 图标改为箭头或进入样式，或者保持医生图标 -->
-            <i class="fa-solid fa-wand-magic-sparkles text-xl md:text-2xl"></i>
+        <button onclick="navigateToAnalysis()" class="ai-btn-pulse bg-rose-900 hover:bg-rose-800 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-xl flex items-center justify-center transition-transform group active:scale-90 ring-4 ring-rose-900/20" title="进入智能病案分析">
+            <i class="fa-solid fa-wand-magic-sparkles text-xl md:text-2xl group-hover:rotate-12 transition-transform"></i>
         </button>
     </div>
 
     <script>
-        // === 核心数据库 ===
-        const zangFuDB = {
-            'Heart': [
-                {n:'心血虚证', t:'虚', s:'心悸，失眠多梦，健忘，眩晕，面色萎黄，唇舌色淡，脉细无力。', a:'血虚不能濡养心脏，心神失养则悸、眠差；血不上荣则面黄、眩晕。'},
-                {n:'心阴虚证', t:'虚', s:'心悸，心烦，失眠，潮热盗汗，手足心热，舌红少津，脉细数。', a:'阴虚生内热，虚热扰神则心烦；阴液亏损则舌红少津。'},
-                {n:'心气虚证', t:'虚', s:'心悸，气短，神疲乏力，活动后加重，自汗，面色淡白，脉虚。', a:'气虚无力鼓动，心气不足，故活动后加重；卫外不固则自汗。'},
-                {n:'心阳虚证', t:'虚', s:'心悸，胸闷气短，形寒肢冷，面色苍白，舌淡胖苔白，脉沉迟或结代。', a:'阳虚失温，寒从内生。'},
-                {n:'心阳虚脱证', t:'危', s:'在心阳虚基础上，突然冷汗淋漓，四肢厥冷，呼吸微弱，脉微欲绝。', a:'阳气暴脱，宗气大泄，生命垂危。'},
-                {n:'心火亢盛证', t:'实', s:'心烦，失眠，面赤口渴，口舌生疮，尿黄赤，舌红苔黄，脉数。', a:'火热内扰，上炎口舌（开窍于舌），下移小肠（尿赤）。'},
-                {n:'心脉痹阻证', t:'实', s:'心悸，心胸憋闷疼痛，痛引肩背内臂，时作时止。', a:'瘀血、痰浊、寒凝、气滞阻痹心脉。'},
-                {n:'痰蒙心神证', t:'实', s:'神情痴呆，意识模糊，喃喃自语，举止失常，喉中痰鸣，苔白腻，脉滑。', a:'湿痰蒙蔽心窍，神识失灵。属于癫证。'},
-                {n:'痰火扰神证', t:'实', s:'狂躁妄动，打人毁物，胡言乱语，面赤气粗，苔黄腻，脉滑数。', a:'痰火互结，上扰心神。属于狂证。'},
-                {n:'瘀阻脑络证', t:'实', s:'头痛如刺，痛有定处，健忘，失眠，舌紫暗。', a:'瘀血阻滞脑络，气血运行不畅。'},
-                {n:'小肠实热证', t:'实', s:'心烦，口渴，口舌生疮，小便赤涩灼痛，尿血。', a:'心火下移小肠，热伤津液，灼伤脉络。'}
+        // === Data: Nature ===
+        const natureDB = {
+            liuyin: [
+                {t:'风淫证', c:'emerald', d:'特性：轻扬开泄，善行数变。', s:'症：恶风汗出，脉浮缓，游走性痛。'},
+                {t:'寒淫证', c:'blue', d:'特性：凝滞收引。', s:'症：冷痛剧烈，得温痛减，恶寒无汗。'},
+                {t:'暑淫证', c:'amber', d:'特性：炎热，升散，挟湿。', s:'症：高热口渴，多汗，神疲乏力。'},
+                {t:'湿淫证', c:'stone', d:'特性：重浊粘滞。', s:'症：头重如裹，苔腻，身重酸痛。'},
+                {t:'燥淫证', c:'yellow', d:'特性：干燥伤津。', s:'症：口鼻干燥，干咳无痰，皮肤干涩。'},
+                {t:'火淫证', c:'red', d:'特性：炎上，生风动血。', s:'症：实热大汗，面红目赤，狂躁，出血。'}
             ],
-            'Lung': [
-                {n:'肺气虚证', t:'虚', s:'咳喘无力，气少不足以息，动则更甚，自汗畏风，易感冒。', a:'肺主气，气虚则呼吸无力；卫外不固则易感冒。'},
-                {n:'肺阴虚证', t:'虚', s:'干咳无痰，或痰少而粘，口燥咽干，潮热盗汗，颧红，咯血。', a:'阴虚肺燥，虚火灼伤肺络。'},
-                {n:'风寒犯肺证', t:'实', s:'咳嗽，咯痰稀白，恶寒微热，无汗，头身痛，苔薄白，脉浮紧。', a:'风寒束表，肺气失宣。'},
-                {n:'风热犯肺证', t:'实', s:'咳嗽，痰黄稠，发热，微恶风寒，咽痛，苔薄黄，脉浮数。', a:'风热袭肺，清肃失职。'},
-                {n:'燥邪犯肺证', t:'实', s:'干咳无痰，鼻燥咽干，胸痛，咯血，苔薄白或黄少津。', a:'燥邪伤肺，耗伤津液。'},
-                {n:'肺热炽盛证', t:'实', s:'发热，口渴，咳嗽，气喘，鼻翼扇动，咽痛肿痛，苔黄，脉数。', a:'火热壅肺，肺气上逆。'},
-                {n:'痰热壅肺证', t:'实', s:'咳嗽，咯痰黄稠量多，气喘息粗，胸闷，发热，苔黄腻，脉滑数。', a:'热邪煎熬津液为痰，痰热阻肺。'},
-                {n:'寒痰阻肺证', t:'实', s:'咳嗽，痰多清稀色白，胸闷，形寒肢冷，苔白腻，脉沉缓。', a:'寒饮内停，阻滞气机。'},
-                {n:'饮停胸胁证', t:'实', s:'胸胁胀痛，咳唾引痛，转侧呼吸痛甚。', a:'水饮停于胸胁（悬饮），阻滞气机。'},
-                {n:'风水搏肺证', t:'实', s:'眼睑头面先肿，继及全身，小便不利，恶寒发热。', a:'风邪外袭，肺失宣降，水道不通。'},
-                {n:'大肠湿热证', t:'实', s:'腹痛，下痢脓血，里急后重，肛门灼热，小便短赤。', a:'湿热蕴结大肠，气血壅滞腐败。'},
-                {n:'肠热腑实证', t:'实', s:'高热，日晡潮热，腹部硬满疼痛，大便秘结，苔焦黄起刺。', a:'热邪与积滞互结，腑气不通。'},
-                {n:'肠燥津亏证', t:'虚', s:'大便干结，排便困难，数日一行，口干咽燥。', a:'津液亏损，大肠失润。'},
-                {n:'肠虚滑泻证', t:'虚', s:'利下无度，甚至脱肛，腹部隐痛，喜温喜按。', a:'大肠虚寒，固摄无权。'},
-                {n:'虫积肠道证', t:'实', s:'绕脐腹痛，时作时止，面黄肌瘦，磨牙，嗜食异物。', a:'蛔虫阻滞气机，耗损营养。'}
-            ],
-            'Spleen': [
-                {n:'脾气虚证', t:'虚', s:'食少纳呆，腹胀，便溏，神疲乏力，面色萎黄，少气懒言。', a:'脾气不足，运化无力。'},
-                {n:'脾虚气陷证', t:'虚', s:'脘腹重坠，内脏下垂（脱肛/子宫脱垂），伴气虚症状。', a:'脾气虚弱，升举无力，中气下陷。'},
-                {n:'脾阳虚证', t:'虚', s:'腹痛喜温喜按，纳少腹胀，大便稀溏，肢冷，周身浮肿。', a:'阳虚生内寒，温运失职。'},
-                {n:'脾不统血证', t:'虚', s:'便血，尿血，肌衄，月经过多，崩漏，伴气虚症状。', a:'脾气亏虚，统摄血液无权。'},
-                {n:'湿热蕴脾证', t:'实', s:'脘腹痞闷，纳呆呕恶，身目发黄（色鲜明），口苦，苔黄腻。', a:'湿热内蕴，熏蒸肝胆，阻滞脾胃。'},
-                {n:'寒湿困脾证', t:'实', s:'脘腹痞闷，头身困重，口淡不渴，身目发黄（色晦暗），苔白腻。', a:'寒湿内盛，困阻脾阳。'},
-                {n:'胃气虚证', t:'虚', s:'胃脘隐痛，喜按，纳少，脘胀，嗳气。', a:'胃气虚弱，受纳腐熟功能减退。'},
-                {n:'胃阳虚证', t:'虚', s:'胃脘冷痛，喜温喜按，泛吐清水，口淡不渴。', a:'胃阳不足，虚寒内生。'},
-                {n:'胃阴虚证', t:'虚', s:'胃脘隐痛，饥不欲食，口燥咽干，大便干结，舌红少津。', a:'胃阴亏耗，虚热内扰，受纳失职。'},
-                {n:'寒滞胃脘证', t:'实', s:'胃脘冷痛，遇寒加剧，得温痛减，恶心呕吐。', a:'寒邪凝滞胃脘，阳气被遏。'},
-                {n:'胃热炽盛证', t:'实', s:'胃脘灼痛，消谷善饥，口臭，牙龈肿痛，便秘，舌红苔黄。', a:'火热壅滞胃脘，腐熟机能亢进。'},
-                {n:'食滞胃脘证', t:'实', s:'脘腹胀痛，嗳腐吞酸，厌食，呕吐酸馊，大便臭秽。', a:'饮食停积，胃失和降。'}
-            ],
-            'Liver': [
-                {n:'肝血虚证', t:'虚', s:'眩晕耳鸣，面白无华，爪甲不荣，视物模糊，夜盲，肢麻，经少。', a:'肝血亏虚，头目、筋脉失养。'},
-                {n:'肝阴虚证', t:'虚', s:'头晕眼花，两目干涩，胁肋隐痛，潮热盗汗，舌红少津。', a:'阴液亏损，虚热内扰，肝络失养。'},
-                {n:'肝郁气滞证', t:'实', s:'胸胁胀痛，情志抑郁，善太息，或咽部异物感，痛经，乳房胀痛。', a:'肝失疏泄，气机郁滞。'},
-                {n:'肝火炽盛证', t:'实', s:'头胀痛，面红目赤，口苦口干，急躁易怒，耳鸣，吐血，脉弦数。', a:'火热内蕴，上炎头面，灼伤脉络。'},
-                {n:'肝阳上亢证', t:'杂', s:'眩晕耳鸣，头重脚轻，面红目赤，急躁易怒，腰膝酸软。', a:'肝肾阴虚，水不涵木，肝阳亢逆。上实下虚。'},
-                {n:'肝风内动证', t:'实', s:'抽搐，震颤，麻木，头晕，昏倒。', a:'包含肝阳化风、热极生风、阴虚动风、血虚生风。核心是“风胜则动”。'},
-                {n:'寒凝肝脉证', t:'实', s:'少腹牵引睾丸坠胀冷痛，受寒加重，得温痛减。', a:'寒邪凝滞肝脉，气血凝滞。'},
-                {n:'胆郁痰扰证', t:'实', s:'惊悸失眠，烦躁不安，口苦，呕吐痰涎，眩晕，苔黄腻。', a:'痰热内扰，胆气不宁。'}
-            ],
-            'Kidney': [
-                {n:'肾阳虚证', t:'虚', s:'腰膝酸冷，畏寒肢冷，性功能减退（阳痿/宫寒），五更泻，脉沉迟。', a:'肾阳亏虚，温煦失职，命门火衰。'},
-                {n:'肾阴虚证', t:'虚', s:'腰膝酸软，眩晕耳鸣，失眠多梦，潮热盗汗，五心烦热，遗精。', a:'肾阴亏损，虚热内生，髓海失充。'},
-                {n:'肾精不足证', t:'虚', s:'小儿发育迟缓，身材矮小；成人早衰，发脱齿摇，健忘，不孕不育。', a:'肾精亏损，生殖生长发育机能低下。'},
-                {n:'肾气不固证', t:'虚', s:'腰膝酸软，小便频数清长，遗尿，滑精，带下清稀，胎动不安。', a:'肾气亏虚，失于封藏固摄。'},
-                {n:'肾不纳气证', t:'虚', s:'久病咳喘，呼多吸少，动则气喘，自汗，腰膝酸软。', a:'肾气虚衰，摄纳无权。'},
-                {n:'肾虚水泛证', t:'虚', s:'周身浮肿，腰以下甚，按之没指，小便短少，畏寒肢冷。', a:'肾阳虚衰，气化无权，水湿泛滥。'},
-                {n:'膀胱湿热证', t:'实', s:'尿频，尿急，尿痛，小便短赤浑浊，或有砂石。', a:'湿热蕴结膀胱，气化失司。'}
+            qixue: {
+                qi: [
+                    {n:'1. 气虚证', d:'元气不足，机能减退。', k:'神疲乏力，少气懒言，自汗，活动后加重。', c:'bg-white border-indigo-100', tc:'text-indigo-900'},
+                    {n:'2. 气陷证', d:'升举无力，脏器下垂。', k:'脘腹重坠，内脏下垂（脱肛/胃下垂），伴气虚表现。', c:'bg-white border-indigo-100', tc:'text-indigo-900'},
+                    {n:'3. 气不固证', d:'气虚失于固摄。', k:'自汗不止，小便失禁，滑胎，遗精（漏失不止）。', c:'bg-white border-indigo-100', tc:'text-indigo-900'},
+                    {n:'4. 气脱证 (危)', d:'元气衰竭，生命垂危。', k:'面色苍白，汗出不止，口开目合，手撒，脉微欲绝。', c:'bg-indigo-50 border-indigo-200', tc:'text-indigo-900'},
+                    {n:'5. 气滞证', d:'气机阻滞，运行不畅。', k:'胀痛，窜痛，痛无定处，嗳气/矢气后痛减。', c:'bg-white border-indigo-100', tc:'text-indigo-900'},
+                    {n:'6. 气逆证', d:'气机升多降少，脏气上逆。', k:'肺逆（咳喘），胃逆（呕吐/呃逆），肝逆（头痛/晕厥）。', c:'bg-white border-indigo-100', tc:'text-indigo-900'},
+                    {n:'7. 气闭证 (急)', d:'浊邪外阻，气机闭塞。', k:'突然昏倒，不省人事，牙关紧闭，两手握固（实证）。', c:'bg-indigo-900 text-white', tc:'text-white', sc:'text-indigo-200', kc:'text-indigo-100'}
+                ],
+                xue: [
+                    {n:'1. 血虚证', d:'血液亏虚，濡养功能减退。', k:'面色淡白/萎黄，头晕眼花，心悸多梦，手足发麻。', c:'bg-white border-rose-100', tc:'text-rose-900'},
+                    {n:'2. 血脱证 (危)', d:'大量出血，气随血亡。', k:'面色苍白，脉微欲绝或芤，有大出血史。', c:'bg-rose-50 border-rose-200', tc:'text-rose-900'},
+                    {n:'3. 血瘀证', d:'血液运行不畅或离经之血。', k:'刺痛，痛有定处，拒按，肿块，唇舌紫暗，脉涩。', c:'bg-white border-rose-100', tc:'text-rose-900'},
+                    {n:'4. 血热证', d:'火热炽盛，侵扰血分。', k:'出血（色鲜红/量多），斑疹，心烦，舌红绛。', c:'bg-white border-rose-100', tc:'text-rose-900'},
+                    {n:'5. 血寒证', d:'寒邪客于血脉，凝滞不通。', k:'局部冷痛，肤色紫暗，得温痛减，少腹冷痛。', c:'bg-white border-rose-100', tc:'text-rose-900'}
+                ],
+                combined: [
+                    {n:'气血两虚证', k:'既有气虚（乏力自汗），又有血虚（面黄心悸）的表现。'},
+                    {n:'气虚血瘀证', k:'气虚无力行血。乏力 + 刺痛/瘫痪/舌紫暗。'},
+                    {n:'气不摄血证', k:'气虚无法统血。各种慢性出血（便血/崩漏） + 气虚症。'},
+                    {n:'气随血脱证', k:'大出血后，随之出现气脱亡阳症状（冷汗/厥冷）。'},
+                    {n:'气滞血瘀证', k:'气机郁滞导致血行不畅。胀痛（气滞） + 刺痛/肿块（血瘀）。'}
+                ]
+            },
+            jinye: [
+                {n:'1. 津液亏虚证 (伤津/脱液)', c:'amber', s:'口燥咽干，唇焦，皮肤干枯无泽，小便短少，大便干结，舌红少津，脉细数。', a:'津液不足，失去滋润濡养作用。上焦燥则口咽干；外燥则皮毛枯；下焦燥则二便干少。', k:'以口渴、尿少、舌红少苔及各脏腑组织的干燥症状为要点。'},
+                {n:'2. 痰证', c:'stone', s:'咳吐痰多，胸闷，呕吐痰涎，头晕目眩，神昏癫狂，肢体麻木，瘰疬瘿瘤，苔腻，脉滑。', a:'水液代谢障碍，凝聚成痰。阻滞肺系则咳痰；阻滞清阳则眩晕；蒙蔽心窍则神昏；流注经络则麻木/结节。', k:'苔腻，脉滑，及各部位的痰阻症状。'},
+                {n:'3. 饮证', c:'cyan', s:'脘腹痞胀，水声漉漉（痰饮）；胁肋胀痛，咳唾引痛（悬饮）；肢体浮肿沉重（溢饮）；咳喘痰多清稀（支饮）。', a:'饮为稀水，停积于人体脏腑空隙或体表。随停积部位不同而症状各异。', k:'稀水停积（胃肠水声/胸胁胀痛/咳痰清稀），苔白滑，脉弦。'},
+                {n:'4. 水停证 (水肿)', c:'blue', s:'全身或局部水肿，按之凹陷不起，小便不利。', a:'水液泛滥，溢于肌肤。分为阳水（发病急，头面先肿，多风热湿）和阴水（发病慢，腰以下先肿，多脾肾虚）。', k:'水肿（按之没指），小便短少。'}
             ]
         };
 
-        // === 页面逻辑 ===
-        
-        // 页面跳转逻辑
+        // === Data: ZangFu ===
+        const zangFuDB = {
+            'Heart': [
+                {
+                    n:'1. 心血虚证', 
+                    t:'虚', 
+                    s:'心悸，失眠，多梦，头晕眼花，面色淡白或萎黄，唇舌色淡，脉细无力。', 
+                    k:'心悸、失眠、多梦 + 血虚症状。', 
+                    a:'血液亏虚，心失濡养的表现。'
+                },
+                {
+                    n:'2. 心阴虚证', 
+                    t:'虚', 
+                    s:'心悸，心烦，失眠，多梦，口燥咽干，形体消瘦，两颧潮红，手足心热，潮热盗汗，舌红少苔乏津，脉细数。', 
+                    k:'心悸、心烦、失眠 + 阴虚症状。', 
+                    a:'阴液亏损，心失滋养，虚热内扰的表现。'
+                },
+                {
+                    n:'3. 心气虚证', 
+                    t:'虚', 
+                    s:'心悸怔忡，气短胸闷，精神疲倦，自汗，活动后加剧，面色淡白，舌淡，脉虚。', 
+                    k:'心悸怔忡 + 气虚症状。', 
+                    a:'心气不足，鼓动无力。'
+                },
+                {
+                    n:'4. 心阳虚证', 
+                    t:'虚', 
+                    s:'心悸怔忡，胸闷气短，或心胸疼痛，畏寒肢冷，自汗，神疲乏力，面色晄白或面唇青紫，舌质淡胖或紫暗，苔白滑，脉弱或结、代。', 
+                    k:'心悸怔忡、心胸疼痛 + 阳虚症状。', 
+                    a:'心阳虚衰，温运失司，虚寒内生。'
+                },
+                {
+                    n:'5. 心阳虚脱证', 
+                    t:'危', 
+                    s:'在心阳虚基础上，突然冷汗淋漓，四肢厥冷，面色苍白，呼吸微弱，或心悸、心胸剧痛，神志模糊或昏迷，唇舌青紫，脉微欲绝。', 
+                    k:'心悸胸痛、神志模糊或昏迷 + 亡阳症状。', 
+                    a:'心阳衰极，阳气欲脱（危重证候）。'
+                },
+                {
+                    n:'6. 心火亢盛证', 
+                    t:'实', 
+                    s:'心烦失眠，或狂躁谵语，神识不清；口舌生疮，溃烂疼痛；或吐血、衄血；小便短赤，灼热涩痛。舌红，苔黄，脉数。', 
+                    k:'心烦失眠、舌赤生疮、吐衄 + 实热症状。', 
+                    a:'心火内炽，扰神迫血。'
+                },
+                {
+                    n:'7. 心脉痹阻证', 
+                    t:'实', 
+                    s:'心悸怔忡，心胸憋闷疼痛，痛引肩背内臂，时作时止。<br>• 瘀阻：刺痛，舌暗，脉细涩。<br>• 痰阻：闷痛，体胖痰多，苔腻，脉滑。<br>• 寒凝：遇寒痛剧，形寒，苔白，脉迟/紧。<br>• 气滞：胀痛，情志相关，脉弦。', 
+                    k:'心悸怔忡、心胸憋闷疼痛 + 瘀、痰、寒、气滞症状。', 
+                    a:'瘀血、痰浊、阴寒、气滞等因素阻痹心脉。'
+                },
+                {
+                    n:'8. 痰蒙心神证', 
+                    t:'实', 
+                    s:'神情痴呆，意识模糊，甚则昏不知人；或精神抑郁，表情淡漠，喃喃独语，举止失常；或突然昏仆，不省人事，口吐涎沫，喉有痰声。苔白腻，脉滑。', 
+                    k:'神志抑郁、错乱、痴呆、昏迷 + 痰浊症状。', 
+                    a:'痰浊内盛，蒙蔽心神。（又称痰迷心窍证）'
+                },
+                {
+                    n:'9. 痰火扰神证', 
+                    t:'实', 
+                    s:'烦躁不宁，失眠多梦，甚或神昏谵语，狂躁妄动，打人毁物，哭笑无常，面红目赤。舌红，苔黄腻，脉滑数。', 
+                    k:'烦躁不宁、狂躁、神昏谵语 + 痰热症状。', 
+                    a:'火热痰浊交结，扰乱心神。'
+                },
+                {
+                    n:'10. 瘀阻脑络证', 
+                    t:'实', 
+                    s:'头晕不已，头痛如刺，痛处固定，经久不愈，健忘，失眠，心悸。舌质紫暗或有斑点，脉细涩。', 
+                    k:'头痛、头晕 + 血瘀症状。', 
+                    a:'瘀血阻滞脑络。'
+                },
+                {
+                    n:'11. 小肠实热证', 
+                    t:'实', 
+                    s:'小便赤涩疼痛，尿血，心烦口渴，口舌生疮，小腹胀痛。舌红，苔黄，脉数。', 
+                    k:'小便赤涩疼痛、心烦、口舌生疮 + 实热症状。', 
+                    a:'心火下移小肠。'
+                }
+            ],
+            'Lung': [
+                {
+                    n:'1. 肺气虚证', 
+                    t:'虚', 
+                    s:'咳喘无力，咯痰清稀，少气懒言，声音低怯，动则尤甚；神疲体倦，面色淡白，自汗，恶风，易于感冒。舌淡苔白，脉弱。', 
+                    k:'咳、喘、痰稀 + 气虚症状。', 
+                    a:'肺气虚弱，宣肃、卫外功能减退。'
+                },
+                {
+                    n:'2. 肺阴虚证', 
+                    t:'虚', 
+                    s:'干咳无痰，或痰少而黏，不易咳出，或痰中带血，声音嘶哑；形体消瘦，口干咽燥，五心烦热，潮热盗汗。舌红少津，脉细数。', 
+                    k:'干咳无痰、痰少而黏 + 阴虚症状。', 
+                    a:'肺阴亏虚，虚热内生。'
+                },
+                {
+                    n:'3. 风寒犯肺证', 
+                    t:'实', 
+                    s:'咳嗽，痰稀色白，恶寒发热，鼻塞流清涕，头身疼痛，无汗。苔薄白，脉浮紧。', 
+                    k:'咳嗽、痰稀色白 + 风寒表证。', 
+                    a:'风寒侵袭，肺卫失宣。'
+                },
+                {
+                    n:'4. 风热犯肺证', 
+                    t:'实', 
+                    s:'咳嗽，痰稠色黄，发热微恶风寒，鼻塞流浊涕，口干微渴，咽喉肿痛。舌尖红，苔薄黄，脉浮数。', 
+                    k:'咳嗽、痰黄稠 + 风热表证。', 
+                    a:'风热侵犯，肺卫失宣。'
+                },
+                {
+                    n:'5. 燥邪犯肺证', 
+                    t:'实', 
+                    s:'干咳无痰，或痰少而黏，难以咳出，甚则胸痛，痰中带血；口、唇、舌、鼻、咽干燥，或见鼻衄。苔薄干，脉浮数或浮紧。', 
+                    k:'干咳无痰、痰少而黏 + 燥证症状。', 
+                    a:'燥邪侵犯，肺失清润。'
+                },
+                {
+                    n:'6. 肺热炽盛证', 
+                    t:'实', 
+                    s:'咳嗽，气喘，胸痛，气息灼热，咽喉红肿疼痛，发热，口渴，大便秘结，小便短赤。舌红苔黄，脉数。', 
+                    k:'咳嗽、气喘、胸痛 + 里实热症状。', 
+                    a:'热邪壅肺，肺失清肃。（又称热邪壅肺证）'
+                },
+                {
+                    n:'7. 痰热壅肺证', 
+                    t:'实', 
+                    s:'咳嗽，气喘息粗，胸闷，或喉中痰鸣，咯痰黄稠量多，或咳吐脓血腥臭痰，胸痛，发热口渴。舌红苔黄腻，脉滑数。', 
+                    k:'咳嗽、气喘息粗 + 痰热症状。', 
+                    a:'痰热交结，壅滞于肺。'
+                },
+                {
+                    n:'8. 寒痰阻肺证', 
+                    t:'实', 
+                    s:'咳嗽气喘，痰多色白，或喉中哮鸣，胸闷，形寒肢冷。舌淡苔白腻或白滑，脉濡缓或滑。', 
+                    k:'咳嗽、气喘 + 寒痰症状。', 
+                    a:'寒痰交阻于肺。'
+                },
+                {
+                    n:'9. 饮停胸胁证', 
+                    t:'实', 
+                    s:'胸廓饱满，胸胁胀闷或痛，呼吸、咳嗽或转侧时牵引作痛，或伴头晕目眩。苔白滑，脉沉弦。', 
+                    k:'胸廓饱满、胸胁胀闷或痛 + 饮停症状。', 
+                    a:'水饮停于胸胁，阻滞气机。'
+                },
+                {
+                    n:'10. 风水搏肺证', 
+                    t:'实', 
+                    s:'浮肿始自眼睑、头面，继及全身，上半身肿甚，来势迅速，皮肤光亮，小便短少，恶寒发热。苔薄白，脉浮紧。', 
+                    k:'骤起面、睑浮肿 + 卫表症状。', 
+                    a:'风邪袭肺，通调水道失职，水湿泛滥肌肤。'
+                },
+                {
+                    n:'11. 大肠湿热证', 
+                    t:'实', 
+                    s:'腹痛，腹泻，肛门灼热，或暴注下泻，色黄味臭；或下痢赤白脓血，里急后重。舌红苔黄腻，脉滑数。', 
+                    k:'腹痛、泄泻 + 湿热症状。', 
+                    a:'湿热蕴阻肠道气机。'
+                },
+                {
+                    n:'12. 肠热腑实证', 
+                    t:'实', 
+                    s:'腹满硬痛、拒按，大便秘结，或热结旁流，气味恶臭，壮热，神昏谵语。舌红，苔黄厚而燥，脉沉数有力。', 
+                    k:'腹满硬痛、便秘 + 里热炽盛症状。', 
+                    a:'热邪入里，与肠中糟粕相搏。'
+                },
+                {
+                    n:'13. 肠燥津亏证', 
+                    t:'虚', 
+                    s:'大便干结难解，状如羊屎，数日一行，腹胀作痛，口干，或口臭，头晕。舌红少津，苔黄燥，脉细涩。', 
+                    k:'大便燥结难下 + 津亏症状。', 
+                    a:'津液亏损，肠失濡润。'
+                },
+                {
+                    n:'14. 肠虚滑泻证', 
+                    t:'虚', 
+                    s:'下利无度，或大便失禁，甚则脱肛，腹痛隐隐，喜温喜按，畏寒神疲。舌淡苔白滑，脉弱。', 
+                    k:'大便失禁 + 阳虚症状。', 
+                    a:'大肠阳气虚衰，不能固摄。（又称大肠虚寒证）'
+                },
+                {
+                    n:'15. 虫积肠道证', 
+                    t:'实', 
+                    s:'胃脘或脐周疼痛，时作时止，面黄体瘦，大便排虫。', 
+                    k:'腹痛、面黄肌瘦 + 吐虫/便虫。', 
+                    a:'蛔虫等寄居肠道。'
+                }
+            ],
+            'Spleen': [
+                {
+                    n:'1. 脾气虚证', 
+                    t:'虚', 
+                    s:'不欲食或纳少，腹胀，食后胀甚，便溏；神疲乏力，少气懒言，肢体倦怠，或浮肿/消瘦，面色萎黄。舌淡苔白，脉缓或弱。', 
+                    k:'纳少、腹胀、便溏 + 气虚症状。', 
+                    a:'脾气不足，运化失职。'
+                },
+                {
+                    n:'2. 脾虚气陷证', 
+                    t:'虚', 
+                    s:'眩晕，泄泻，脘腹重坠作胀，食后益甚；或便意频数，肛门重坠，甚至脱肛；或子宫下垂，崩漏；伴见气虚症状。', 
+                    k:'眩晕、泄泻、脘腹重坠、内脏下垂 + 气虚症状。', 
+                    a:'脾气虚弱，升举无力而反下陷。（又称中气下陷证）'
+                },
+                {
+                    n:'3. 脾阳虚证', 
+                    t:'虚', 
+                    s:'腹痛绵绵，喜温喜按，纳少腹胀，大便清稀或完谷不化；畏寒肢冷，或肢体浮肿，或白带清稀量多。舌淡胖或有齿痕，苔白滑，脉沉迟无力。', 
+                    k:'腹胀、腹痛、大便清稀 + 阳虚症状。', 
+                    a:'脾阳虚衰，失于温运，阴寒内生。'
+                },
+                {
+                    n:'4. 脾不统血证', 
+                    t:'虚', 
+                    s:'各种出血（便血、尿血、肌衄、鼻衄、齿衄、月经过多/崩漏）+ 脾气虚症状（便溏、神疲、纳少等）。舌淡苔白，脉细弱。', 
+                    k:'各种出血 + 脾气虚症状。', 
+                    a:'脾气虚弱，统血失常，血溢脉外。'
+                },
+                {
+                    n:'5. 湿热蕴脾证', 
+                    t:'实', 
+                    s:'脘腹胀闷，纳呆，恶心欲呕，口苦口黏，渴不多饮，便溏不爽，小便短黄，肢体困重；或身热不扬，汗出热不解；或面目发黄，色鲜明，皮肤瘙痒。舌质红，苔黄腻，脉濡数。', 
+                    k:'腹胀、纳呆、便溏 + 湿热症状。', 
+                    a:'湿热内蕴，脾失健运。'
+                },
+                {
+                    n:'6. 寒湿困脾证', 
+                    t:'实', 
+                    s:'脘腹痞闷，腹痛便溏，口腻纳呆，泛恶欲呕，头身困重，面色晦黄；或身目发黄，黄色晦暗如烟熏；或妇女白带量多；或肢体浮肿。舌淡胖，苔白腻，脉濡缓或沉细。', 
+                    k:'脘腹痞闷、纳呆、腹胀、便溏、身重 + 寒湿症状。', 
+                    a:'寒湿内盛，困阻脾阳，运化失职。'
+                },
+                {
+                    n:'7. 胃气虚证', 
+                    t:'虚', 
+                    s:'纳少，胃脘痞满，隐痛喜按，暖气，面色萎黄，神疲乏力。舌淡苔薄白，脉弱。', 
+                    k:'胃脘痞满、隐痛喜按、纳少 + 气虚症状。', 
+                    a:'胃气虚弱，胃失和降。'
+                },
+                {
+                    n:'8. 胃阳虚证', 
+                    t:'虚', 
+                    s:'胃脘冷痛，绵绵不已，喜温喜按，食后缓解，泛吐清水或夹有不消化食物，纳少脘痞，口淡不渴，畏寒肢冷。舌淡胖嫩，脉沉迟无力。', 
+                    k:'胃脘冷痛、喜温喜按 + 阳虚症状。', 
+                    a:'胃阳不足，胃失温养，虚寒内生。'
+                },
+                {
+                    n:'9. 胃阴虚证', 
+                    t:'虚', 
+                    s:'胃脘隐隐灼痛，嘈杂不舒，饥不欲食，干呕，呃逆，口燥咽干，大便干结，小便短少。舌红少苔，脉细数。', 
+                    k:'胃脘隐隐灼痛、饥不欲食 + 阴虚症状。', 
+                    a:'胃阴亏虚，胃失濡润、和降。'
+                },
+                {
+                    n:'10. 寒滞胃脘证', 
+                    t:'实', 
+                    s:'胃脘冷痛剧烈，得温痛减，遇寒加重，恶心呕吐，吐后痛缓，或口泛清水，口淡不渴。舌淡苔白润，脉弦紧或沉紧。', 
+                    k:'胃脘冷痛、恶心呕吐 + 实寒症状。', 
+                    a:'寒邪犯胃，阻滞气机。（又称胃寒证）'
+                },
+                {
+                    n:'11. 胃热炽盛证', 
+                    t:'实', 
+                    s:'胃脘灼痛、拒按，消谷善饥，口气臭秽，齿龈红肿疼痛，或溃烂出血，渴喜冷饮，大便秘结。舌红苔黄，脉滑数。', 
+                    k:'胃脘灼痛、消谷善饥 + 实热症状。', 
+                    a:'火热壅滞于胃，胃失和降。（又称胃火证）'
+                },
+                {
+                    n:'12. 食滞胃脘证', 
+                    t:'实', 
+                    s:'胃脘胀满疼痛、拒按，厌恶食物，暖腐吞酸，或呕吐酸馊食物，吐后胀痛得减；或腹胀腹痛，泻下不爽，矢气臭如败卵。苔厚腻，脉滑。', 
+                    k:'胃脘胀满疼痛、嗳腐吞酸、泻下臭秽 + 气滞症状。', 
+                    a:'饮食停积胃脘。'
+                }
+            ],
+            'Liver': [
+                {
+                    n:'1. 肝血虚证', 
+                    t:'虚', 
+                    s:'头晕目眩，视力减退或夜盲，爪甲不荣，肢体麻木，失眠多梦，妇女月经量少、色淡，甚则闭经，面唇淡白。舌淡，脉细。', 
+                    k:'眩晕、视力减退、肢体麻木 + 血虚症状。', 
+                    a:'肝血不足，机体失养。'
+                },
+                {
+                    n:'2. 肝阴虚证', 
+                    t:'虚', 
+                    s:'头晕眼花，两目干涩，视物不清，胁肋隐隐灼痛，口燥咽干，五心烦热，两颧潮红，潮热盗汗。舌红少苔，脉弦细数。', 
+                    k:'眩晕、目涩、胁肋隐痛 + 阴虚症状。', 
+                    a:'肝阴不足，虚热内生。'
+                },
+                {
+                    n:'3. 肝郁气滞证', 
+                    t:'实', 
+                    s:'胸胁、少腹胀满疼痛，走窜不定，情志抑郁，善太息；妇女可见乳房胀痛、月经不调、痛经。苔薄白，脉弦。', 
+                    k:'情志抑郁、胸胁/少腹胀痛、脉弦 + 气滞症状。', 
+                    a:'肝失疏泄，气机郁滞，情志抑郁。'
+                },
+                {
+                    n:'4. 肝火炽盛证', 
+                    t:'实', 
+                    s:'头目胀痛，眩晕，面红目赤，口苦口干，急躁易怒，失眠多梦，耳鸣耳聋，或耳痛流脓，或胁肋灼痛，或吐血、衄血，大便秘结，小便短黄。舌红苔黄，脉弦数。', 
+                    k:'头目胀痛、胁痛、烦躁、耳鸣 + 实热症状。', 
+                    a:'火热炽盛，内扰于肝，气火上逆。'
+                },
+                {
+                    n:'5. 肝阳上亢证', 
+                    t:'杂', 
+                    s:'眩晕耳鸣，头目胀痛，面红目赤，急躁易怒，失眠多梦，腰膝酸软，头重脚轻。舌红少津，脉弦或弦细数。', 
+                    k:'头目胀痛、眩晕耳鸣、急躁易怒 + 头重脚轻、腰膝酸软（上实下虚）。', 
+                    a:'肝肾阴亏，阴不制阳，阳亢于上（上实下虚）。'
+                },
+                {
+                    n:'6. 肝风内动证', 
+                    t:'危', 
+                    s:'眩晕、麻木、抽搐、震颤。<br>1. 肝阳化风：眩晕欲仆，手足震颤，语言謇涩。<br>2. 热极生风：高热神昏，抽搐，角弓反张。<br>3. 阴虚动风：手足蠕动，五心烦热。<br>4. 血虚生风：肢体麻木，震颤，面白无华。', 
+                    k:'动摇症状（眩晕、麻木、抽搐、震颤）。', 
+                    a:'阳亢、火热、阴虚、血虚等所致，出现“动摇”症状。'
+                },
+                {
+                    n:'7. 寒凝肝脉证', 
+                    t:'实', 
+                    s:'少腹冷痛，阴囊收缩，睾丸引痛，或颠顶冷痛，遇寒痛甚，得温痛减，恶寒肢冷。舌苔白，脉沉弦或沉紧。', 
+                    k:'少腹、前阴、颠顶冷痛 + 实寒症状。', 
+                    a:'寒邪侵袭，凝滞肝经。'
+                },
+                {
+                    n:'8. 胆郁痰扰证', 
+                    t:'实', 
+                    s:'惊悸失眠，胆怯易惊，烦躁不安，犹豫不决，口苦呕恶，胸胁闷胀，眩晕耳鸣。舌红苔黄腻，脉弦数。', 
+                    k:'惊悸失眠/口苦 + 痰热症状。', 
+                    a:'痰热内扰，胆气不宁。'
+                }
+            ],
+            'Kidney': [
+                {
+                    n:'1. 肾阳虚证', 
+                    t:'虚', 
+                    s:'腰膝酸软冷痛，畏寒肢冷，下肢尤甚，面色晄白或黧黑，神疲乏力；或性欲冷淡，男子阳痿、早泄，女子宫寒不孕；或尿频清长，夜尿多。舌淡苔白，脉沉细无力。', 
+                    k:'腰膝冷痛、性欲减退、夜尿多 + 虚寒症状。', 
+                    a:'肾阳亏虚，机体失温。'
+                },
+                {
+                    n:'2. 肾虚水泛证', 
+                    t:'虚', 
+                    s:'全身浮肿，腰以下为甚，按之没指，小便短少，腰膝酸软冷痛，畏寒肢冷，腹部胀满，或心悸气短。舌淡胖苔白滑，脉沉迟无力。', 
+                    k:'浮肿腰以下为甚、小便短少 + 肾阳虚症状。', 
+                    a:'肾阳亏虚，气化无权，水液泛溢。'
+                },
+                {
+                    n:'3. 肾阴虚证', 
+                    t:'虚', 
+                    s:'腰膝酸软而痛，眩晕耳鸣，失眠多梦，形体消瘦，潮热盗汗，五心烦热，咽干颧红；或见性欲偏亢，遗精早泄，经少/崩漏。舌红少苔，脉细数。', 
+                    k:'腰膝耳鸣、男子遗精/女子月经失调 + 阴虚症状。', 
+                    a:'肾阴亏损，失于滋养，虚热内扰。'
+                },
+                {
+                    n:'4. 肾精不足证', 
+                    t:'虚', 
+                    s:'小儿：生长发育迟缓，身材矮小，囟门迟闭，智力低下，骨骼痿软（五迟五软）。<br>成人：早衰，发脱齿摇，耳鸣耳聋，健忘恍惚，神情呆大，足痿无力，性功能低下。', 
+                    k:'小儿生长发育迟缓、成人早衰/生殖机能低下。', 
+                    a:'肾精亏损，脑与骨、髓失充。'
+                },
+                {
+                    n:'5. 肾气不固证', 
+                    t:'虚', 
+                    s:'腰膝酸软，神疲乏力，耳鸣失聪。<br>• 小便异常：尿频清长，夜尿多，遗尿，尿失禁。<br>• 精关不固：滑精、早泄。<br>• 冲任不固：经淋沥，带下清稀，胎动易滑。', 
+                    k:'腰膝酸软 + 小便/精液/经带/胎元不固 + 气虚症状。', 
+                    a:'肾气亏虚，失于封藏、固摄。'
+                },
+                {
+                    n:'6. 肾不纳气证', 
+                    t:'虚', 
+                    s:'久病咳喘，呼多吸少，气不接续，动则喘甚，腰膝酸软，自汗神疲。舌淡苔白，脉沉弱；或喘息加剧，冷汗淋漓（阳虚欲脱）。', 
+                    k:'久病咳喘、呼多吸少、动则尤甚 + 肾气虚症状。', 
+                    a:'肾气亏虚，纳气无权。'
+                },
+                {
+                    n:'7. 膀胱湿热证', 
+                    t:'实', 
+                    s:'尿频，尿急，尿道涩滞灼痛，小便短黄 or 浑浊，或尿血，或尿中见砂石，小腹胀痛。舌红苔黄腻，脉滑数。', 
+                    k:'尿频、尿急、尿道涩滞灼痛、尿短黄 + 湿热症状。', 
+                    a:'湿热侵袭，蕴结膀胱。'
+                }
+            ],
+            // 新增：脏腑兼证数据
+            'Combined': [
+                {n:'1. 心肾不交证', t:'虚', s:'心烦，心悸，失眠，多梦，头晕，耳鸣，腰膝酸软，梦遗，口燥咽干，五心烦热，潮热盗汗，便结尿黄。舌红少苔，脉细数。', k:'心烦、失眠、腰膝酸软、耳鸣、梦遗 + 虚热症状。', a:'心肾水火既济失调。'},
+                {n:'2. 心肾阳虚证', t:'虚', s:'心悸怔忡，腰膝酸冷，肢体浮肿，小便不利，形寒肢冷，神疲乏力，唇甲青紫。舌淡暗或青紫，苔白滑，脉弱。', k:'心悸怔忡、腰膝酸冷、肢体浮肿 + 虚寒症状。', a:'心与肾的阳气虚衰，温煦失职，水气凌心。'},
+                {n:'3. 心肺气虚证', t:'虚', s:'心悸胸闷，咳嗽，气喘，气短，动则尤甚，咳痰清稀，神疲乏力，声低懒言，自汗，面色淡白。舌淡苔白，脉弱或结、代。', k:'心悸、胸闷、咳嗽、气喘 + 气虚症状。', a:'心肺两脏气虚，功能减退。'},
+                {n:'4. 心脾两虚证', t:'虚', s:'心悸怔忡，失眠多梦，食欲不振，腹胀便溏，面色萎黄，眩晕耳鸣，神疲乏力；或见各种慢性出血（便血、崩漏等），血色淡。舌淡嫩，脉弱。', k:'心悸、失眠多梦、食少便溏、慢性出血 + 气血两虚症状。', a:'心血不足，脾气虚弱。'},
+                {n:'5. 心肝血虚证', t:'虚', s:'心悸怔忡，失眠多梦，健忘，眩晕，视物模糊，雀盲，爪甲不荣，肢体麻木，甚至震颤、拘挛，面白无华，妇女月经量少色淡，甚则闭经。舌淡苔白，脉细。', k:'心悸、失眠、眩晕、爪甲不荣、肢麻 + 血虚症状。', a:'血液亏少，心肝失养。'},
+                {n:'6. 脾肺气虚证', t:'虚', s:'久咳不止，气短而喘，咳痰清稀，食欲不振，腹胀便溏，面白无华，神疲乏力，声低懒言，或见面浮肢肿。舌淡苔白滑，脉弱。', k:'咳嗽气喘、痰液清稀、食少便溏 + 气虚症状。', a:'脾肺两脏气虚。'},
+                {n:'7. 肺肾阴虚证', t:'虚', s:'咳嗽痰少，或痰中带血，或声音嘶哑，腰膝酸软，形体消瘦，口燥咽干，骨蒸潮热，盗汗，颧红，男子遗精，女子经少或崩漏。舌红少苔，脉细数。', k:'干咳少痰、腰酸、遗精 + 虚热症状。', a:'肺肾阴液亏虚，虚热内扰。'},
+                {n:'8. 肝火犯肺证', t:'实', s:'胸胁灼痛，急躁易怒，头胀头晕，咳嗽阵作，痰黄黏稠，甚则咳血，烦热口苦，面红目赤。舌红苔薄黄，脉弦数。', k:'胸胁灼痛、急躁易怒、咳嗽阵作或咳血 + 实热症状。', a:'肝火炽盛，上逆犯肺（木火刑金）。'},
+                {n:'9. 肝胃不和证', t:'实', s:'胃脘、胁肋胀痛或窜痛，胃脘痞满，呃逆，暖气，吞酸嘈杂，饮食减少，情绪抑郁，善太息，或烦躁易怒。舌淡红，苔薄白或薄黄，脉弦。', k:'脘胁胀痛、暖气、吞酸 + 情志抑郁/气滞症状。', a:'肝气郁结，横逆犯胃（木横侮土）。'},
+                {n:'10. 肝郁脾虚证', t:'杂', s:'胸胁胀满窜痛，腹胀纳呆，腹痛欲泻，泻后痛减，或便溏不爽，肠鸣矢气，兼见善太息，情志抑郁，或急躁易怒。舌苔白，脉弦或缓。', k:'胸胁胀满、腹胀、便溏 + 情志抑郁症状。', a:'肝失疏泄，脾失健运（木乘土）。'},
+                {n:'11. 肝胆湿热证', t:'实', s:'胁肋胀痛，纳呆腹胀，泛恶欲呕，口苦厌油，身目发黄，大便不调，小便短黄；或寒热往来；或阴部潮湿、瘙痒，男子睾丸肿胀热痛，妇女带下黄臭。舌红，苔黄腻，脉弦滑数。', k:'胁肋胀痛、身目发黄 + 湿热症状。', a:'湿热内蕴肝胆，疏泄失常。'},
+                {n:'12. 肝肾阴虚证', t:'虚', s:'头晕目眩，胸胁隐痛，两目干涩，耳鸣健忘，腰膝酸软，失眠多梦，口燥咽干，五心烦热，或低热颧红，男子遗精，女子月经量少。舌红少苔，脉细数。', k:'胸胁隐痛、腰膝酸软、眩晕耳鸣、两目干涩 + 虚热症状。', a:'肝肾两脏阴液亏虚，虚热内扰。'},
+                {n:'13. 脾肾阳虚证', t:'虚', s:'腰膝、下腹冷痛，久泻久痢，或五更泄泻（黎明前腹痛泄泻），完谷不化，便质清冷，或全身浮肿，小便不利，形寒肢冷，面色晄白。舌淡胖，苔白滑，脉沉迟无力。', k:'腰腹冷痛、久泻久痢、五更泄泻 + 虚寒症状。', a:'脾肾阳气亏虚，温化失职，虚寒内生。'}
+            ]
+        };
+
+        // === 逻辑函数 ===
         function navigateToAnalysis() {
-            // 添加淡出效果
             document.body.classList.add('fade-out');
-            
-            // 延迟后跳转，配合 CSS transition 时间 (0.5s)
             setTimeout(() => {
-                // 尝试跳转 (添加 try-catch 以处理预览环境限制)
-                try {
-                    window.location.href = 'analysis.html';
+                try { 
+                    // 修复：跳转到正确的 analysis_home.html
+                    window.location.href = 'analysis_home.html'; 
                 } catch (e) {
-                    console.warn("Preview environment navigation blocked:", e);
-                    alert("提示：页面跳转功能需要在本地下载文件后运行才能生效。\n(Navigation requires running downloaded files locally.)");
-                    // 恢复状态
+                    console.warn("Nav blocked:", e);
+                    alert("提示：页面跳转功能需要在本地下载文件后运行才能生效。");
                     document.body.classList.remove('fade-out');
                 }
             }, 500);
         }
 
-        // 切换移动端菜单
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
+            menu.classList.toggle('hidden');
         }
 
         function switchView(viewId) {
+            // Hide all sections
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
             
-            document.querySelectorAll('nav button').forEach(btn => {
-                btn.classList.remove('nav-active');
-                btn.classList.add('text-slate-500');
-            });
-            document.querySelectorAll('#mobile-menu button').forEach(btn => {
-                btn.classList.remove('nav-active');
+            // Reset all nav buttons (desktop & mobile)
+            const allNavBtns = document.querySelectorAll('nav button, #mobile-menu button');
+            allNavBtns.forEach(btn => {
+                btn.classList.remove('nav-active', 'text-rose-900', 'bg-rose-50');
                 btn.classList.add('text-slate-500');
             });
 
+            // Show target section
             document.getElementById('view-' + viewId).classList.remove('hidden');
             
+            // Activate Desktop Btn
             const navBtn = document.getElementById('nav-' + viewId);
-            if(navBtn) {
-                navBtn.classList.add('nav-active');
-                navBtn.classList.remove('text-slate-500');
+            if(navBtn) { 
+                navBtn.classList.add('nav-active'); 
+                navBtn.classList.remove('text-slate-500'); 
             }
             
+            // Activate Mobile Btn
             const mobNavBtn = document.getElementById('mob-nav-' + viewId);
-            if(mobNavBtn) {
-                mobNavBtn.classList.add('nav-active');
-                mobNavBtn.classList.remove('text-slate-500');
+            if(mobNavBtn) { 
+                mobNavBtn.classList.add('nav-active', 'text-rose-900', 'bg-rose-50'); 
+                mobNavBtn.classList.remove('text-slate-500'); 
             }
-
+            
+            // Close mobile menu
             document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function showNatureSub(subId) {
             document.querySelectorAll('.nature-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('nature-' + subId).classList.remove('hidden');
-            
             document.querySelectorAll('.nature-btn').forEach(btn => {
                 btn.classList.remove('border-rose-200', 'text-rose-900', 'font-bold', 'shadow-sm', 'bg-rose-50', 'active');
                 btn.classList.add('border-transparent', 'text-slate-600');
@@ -585,47 +913,115 @@
             btn.classList.remove('border-transparent', 'text-slate-600');
         }
 
+        // 渲染病性辨证内容
+        function renderNature() {
+            // 六淫
+            const liuyinHTML = natureDB.liuyin.map(i => 
+                `<div class="p-4 border rounded-xl bg-stone-50 active:bg-white transition hover:shadow-md hover:bg-white border-stone-100 group">
+                    <strong class="text-${i.c}-700 block mb-2 text-lg group-hover:text-${i.c}-900 transition-colors">${i.t}</strong>
+                    <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                        <span class="block mb-1"><strong class="text-slate-800">特性：</strong>${i.d.split('：')[1]}</span>
+                        <span><strong class="text-slate-800">症候：</strong>${i.s.split('：')[1]}</span>
+                    </p>
+                </div>`).join('');
+            document.getElementById('grid-liuyin').innerHTML = liuyinHTML;
+
+            // 阴阳
+            const yy = `
+                <div class="mb-6">
+                    <h4 class="font-bold text-slate-700 mb-4 pl-3 border-l-4 border-rose-900">阴阳虚损 (慢性)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50/50 border border-blue-100 p-5 rounded-xl hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-2">
+                                <strong class="text-blue-900 text-lg">阳虚证 (虚寒)</strong>
+                                <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-bold">机能减退 + 寒象</span>
+                            </div>
+                            <p class="text-sm text-slate-700 leading-relaxed">畏寒肢冷，神疲乏力，口淡不渴，舌淡胖苔白。</p>
+                        </div>
+                        <div class="bg-orange-50/50 border border-orange-100 p-5 rounded-xl hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-2">
+                                <strong class="text-orange-900 text-lg">阴虚证 (虚热)</strong>
+                                <span class="text-[10px] bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-bold">阴液亏损 + 热象</span>
+                            </div>
+                            <p class="text-sm text-slate-700 leading-relaxed">形体消瘦，潮热盗汗，五心烦热，舌红少苔。</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-700 mb-4 pl-3 border-l-4 border-stone-800">阴阳亡失 (危重)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-stone-800 text-white p-5 rounded-xl relative overflow-hidden shadow-lg group">
+                            <div class="absolute right-[-10px] top-[-10px] opacity-10 text-7xl group-hover:rotate-12 transition-transform"><i class="fa-solid fa-snowflake"></i></div>
+                            <strong class="text-lg block mb-2 text-blue-200">亡阳证</strong>
+                            <p class="text-sm text-stone-300 leading-relaxed"><span class="text-white font-bold">要点：</span>冷汗淋漓（味淡），四肢厥冷，神情淡漠，脉微欲绝。<br><span class="text-xs opacity-70 mt-2 block pt-2 border-t border-stone-700">机理：阳气暴脱，温煦固摄功能丧失。</span></p>
+                        </div>
+                        <div class="bg-stone-100 border border-stone-300 p-5 rounded-xl relative overflow-hidden hover:shadow-lg transition group">
+                            <div class="absolute right-[-10px] top-[-10px] opacity-5 text-7xl group-hover:rotate-12 transition-transform"><i class="fa-solid fa-fire"></i></div>
+                            <strong class="text-lg block mb-2 text-red-800">亡阴证</strong>
+                            <p class="text-sm text-slate-700 leading-relaxed"><span class="text-stone-900 font-bold">要点：</span>汗热而粘（味咸），手足温，虚烦躁扰，脉躁疾无力。<br><span class="text-xs text-slate-500 mt-2 block pt-2 border-t border-stone-200">机理：阴液枯竭，虚阳浮越。</span></p>
+                        </div>
+                    </div>
+                </div>`;
+            document.getElementById('content-yinyang').innerHTML = yy;
+
+            // 气血
+            let qx = `<div><h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-indigo-100 text-indigo-800 rounded-lg flex items-center justify-center mr-2 text-sm"><i class="fa-solid fa-wind"></i></span>气病辨证 (7种)</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">`;
+            qx += natureDB.qixue.qi.map(i => `<div class="p-3 ${i.c} rounded-lg shadow-sm hover:shadow-md transition"><strong class="${i.tc} block mb-1">${i.n}</strong><p class="text-xs ${i.sc||'text-slate-500'} mb-1">${i.d}</p><p class="text-sm ${i.kc||'text-slate-700'}"><strong>要点：</strong>${i.k}</p></div>`).join('');
+            qx += `</div></div><div class="mt-6"><h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-rose-100 text-rose-800 rounded-lg flex items-center justify-center mr-2 text-sm"><i class="fa-solid fa-droplet"></i></span>血病辨证 (5种)</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">`;
+            qx += natureDB.qixue.xue.map(i => `<div class="p-3 ${i.c} rounded-lg shadow-sm hover:shadow-md transition"><strong class="${i.tc} block mb-1">${i.n}</strong><p class="text-xs text-slate-500 mb-1">${i.d}</p><p class="text-sm text-slate-700"><strong>要点：</strong>${i.k}</p></div>`).join('');
+            qx += `</div></div><div class="pt-6 mt-6 border-t border-dashed border-stone-200"><h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-purple-100 text-purple-800 rounded-lg flex items-center justify-center mr-2 text-sm"><i class="fa-solid fa-link"></i></span>气血同病辨证</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+            qx += natureDB.qixue.combined.map((i, idx) => `<div class="flex gap-3 items-start p-3 bg-stone-50 rounded-lg ${idx===4?'md:col-span-2':''} hover:bg-white hover:shadow-sm transition border border-stone-100"><div class="bg-stone-200 text-stone-700 w-6 h-6 rounded flex items-center justify-center text-xs font-bold shrink-0">${idx+1}</div><div><strong class="text-slate-800">${i.n}</strong><p class="text-sm text-slate-600 mt-1"><strong>要点：</strong>${i.k}</p></div></div>`).join('');
+            qx += `</div></div>`;
+            document.getElementById('content-qixue').innerHTML = qx;
+
+            // 津液
+            const jinyeHTML = natureDB.jinye.map(i => 
+                `<div class="bg-${i.c}-50/50 border border-${i.c}-100 rounded-xl p-5 hover:shadow-md transition hover:bg-white"><h4 class="font-bold text-${i.c==='stone'?'slate':i.c==='cyan'?'cyan-900':'amber-900'} text-lg mb-3 flex items-center"><span class="w-2 h-2 rounded-full bg-${i.c}-400 mr-2"></span>${i.n}</h4><div class="space-y-3">
+                <div class="flex flex-col md:flex-row gap-2 items-start"><span class="text-[10px] font-bold bg-${i.c}-200 text-${i.c}-900 px-2 py-0.5 rounded w-fit shrink-0 mt-0.5">证候表现</span><p class="text-sm text-slate-700">${i.s}</p></div>
+                <div class="flex flex-col md:flex-row gap-2 items-start"><span class="text-[10px] font-bold bg-${i.c}-100 text-${i.c}-800 px-2 py-0.5 rounded w-fit shrink-0 mt-0.5">证候分析</span><p class="text-sm text-slate-600">${i.a}</p></div>
+                <div class="flex flex-col md:flex-row gap-2 items-start"><span class="text-[10px] font-bold bg-white border border-${i.c}-200 text-${i.c}-800 px-2 py-0.5 rounded w-fit shrink-0 mt-0.5">辨证要点</span><p class="text-sm text-slate-800 font-bold">${i.k}</p></div>
+                </div></div>`).join('');
+            document.getElementById('content-jinye').innerHTML = jinyeHTML;
+        }
+
         function renderZangFu(organ) {
             const container = document.getElementById('zangfu-grid');
             container.innerHTML = '';
+            // 添加 Combined 到 titles 映射
+            const titles = {'Heart':'心与小肠', 'Lung':'肺与大肠', 'Spleen':'脾与胃', 'Liver':'肝与胆', 'Kidney':'肾与膀胱', 'Combined':'脏腑兼病'};
             
-            const titles = {'Heart':'心与小肠', 'Lung':'肺与大肠', 'Spleen':'脾与胃', 'Liver':'肝与胆', 'Kidney':'肾与膀胱'};
-            document.getElementById('organ-title').innerText = titles[organ] + '病辨证';
-
+            // 确保 title 正常显示
+            document.getElementById('organ-title').innerText = (titles[organ] || '脏腑兼病') + '辨证';
+            
             document.querySelectorAll('.organ-btn').forEach(btn => {
-                btn.classList.remove('bg-rose-100', 'text-rose-900', 'ring-2', 'ring-offset-2', 'ring-rose-500', 'active');
+                btn.classList.remove('bg-rose-100', 'text-rose-900', 'ring-2', 'ring-offset-2', 'ring-rose-500', 'active', 'scale-105', 'bg-purple-100', 'text-purple-900', 'ring-purple-500');
                 btn.classList.add('bg-white');
             });
             
             const activeBtn = document.getElementById('btn-organ-' + organ);
-            if (activeBtn) {
+            if (activeBtn) { 
                 activeBtn.classList.remove('bg-white');
-                activeBtn.classList.add('bg-rose-100', 'text-rose-900', 'ring-2', 'ring-offset-2', 'ring-rose-500', 'active');
+                // 特殊处理 Combined 按钮的颜色
+                if (organ === 'Combined') {
+                    activeBtn.classList.add('bg-purple-100', 'text-purple-900', 'ring-2', 'ring-offset-2', 'ring-purple-500', 'active', 'scale-105');
+                } else {
+                    activeBtn.classList.add('bg-rose-100', 'text-rose-900', 'ring-2', 'ring-offset-2', 'ring-rose-500', 'active', 'scale-105'); 
+                }
             }
 
-            const list = zangFuDB[organ];
-            list.forEach(item => {
+            zangFuDB[organ].forEach(item => {
                 const div = document.createElement('div');
-                div.className = "tcm-card p-3 md:p-4 rounded-lg cursor-pointer flex flex-col justify-between";
+                div.className = "tcm-card p-4 md:p-5 rounded-lg cursor-pointer flex flex-col justify-between group h-full";
                 div.onclick = () => openModal(item);
-                
+                // 动态分配标签样式，增加 '杂' 的支持
                 let tagClass = 'tag-han';
                 if(item.t === '虚') tagClass = 'tag-xu';
-                if(item.t === '实') tagClass = 'tag-shi';
-                if(item.t === '热') tagClass = 'tag-re';
+                else if(item.t === '实') tagClass = 'tag-shi';
+                else if(item.t === '热') tagClass = 'tag-re';
+                else if(item.t === '危') tagClass = 'tag-wei';
+                else if(item.t === '杂') tagClass = 'tag-za';
 
-                div.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-slate-800 text-base md:text-lg">${item.n}</h4>
-                            <span class="text-[10px] md:text-xs px-2 py-1 rounded font-bold ${tagClass}">${item.t}</span>
-                        </div>
-                        <p class="text-xs md:text-sm text-slate-500 line-clamp-2">${item.s}</p>
-                    </div>
-                    <div class="mt-2 md:mt-3 text-xs text-rose-600 font-bold flex items-center group">
-                        查看解析 <i class="fa-solid fa-arrow-right ml-1 transition-transform group-hover:translate-x-1"></i>
-                    </div>
-                `;
+                div.innerHTML = `<div><div class="flex justify-between items-start mb-3"><h4 class="font-bold text-slate-800 text-base md:text-lg group-hover:text-rose-900 transition-colors">${item.n}</h4><span class="text-[10px] md:text-xs px-2 py-1 rounded font-bold ${tagClass} shrink-0 ml-2">${item.t}</span></div><p class="text-xs md:text-sm text-slate-500 line-clamp-3 leading-relaxed mb-4">${item.s}</p></div><div class="mt-auto pt-3 border-t border-stone-100 text-xs text-rose-600 font-bold flex items-center justify-end opacity-80 group-hover:opacity-100 transition-opacity">查看解析 <i class="fa-solid fa-arrow-right ml-1 transition-transform group-hover:translate-x-1"></i></div>`;
                 container.appendChild(div);
             });
         }
@@ -633,21 +1029,32 @@
         function openModal(item) {
             document.getElementById('modal-title').innerText = item.n;
             document.getElementById('modal-symptoms').innerText = item.s;
+            // 处理 symptoms 中的 HTML 换行 (如果有 <br>)
+            document.getElementById('modal-symptoms').innerHTML = item.s; 
+            
             document.getElementById('modal-analysis').innerText = item.a;
-            
-            const tags = document.getElementById('modal-tags');
-            tags.innerHTML = `<span class="px-2 py-1 bg-stone-100 text-stone-600 text-xs rounded">八纲：${item.t}</span>`;
-            
+            const keyPointsEl = document.getElementById('modal-keypoints');
+            if(item.k) { 
+                keyPointsEl.innerText = item.k; 
+                keyPointsEl.parentElement.classList.remove('hidden'); 
+            } else { 
+                keyPointsEl.parentElement.classList.add('hidden'); 
+            }
+            document.getElementById('modal-tags').innerHTML = `<span class="px-3 py-1 bg-stone-100 text-stone-600 text-xs rounded-full border border-stone-200 font-medium">八纲分类：${item.t}</span>`;
             document.getElementById('detail-modal').classList.remove('hidden');
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeModal() {
-            document.getElementById('detail-modal').classList.add('hidden');
+        function closeModal() { 
+            document.getElementById('detail-modal').classList.add('hidden'); 
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
         }
 
-        // 初始化
-        window.onload = function() {
-            renderZangFu('Heart');
+        window.onload = function() { 
+            renderZangFu('Heart'); 
+            renderNature(); 
         }
     </script>
 </body>
